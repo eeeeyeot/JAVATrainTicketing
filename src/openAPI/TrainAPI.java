@@ -4,6 +4,7 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -14,7 +15,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import TrainInfo.TrainInfo;
+import trainInfo.TrainInfo;
 
 //출발지 도착지 출발일
 public class TrainAPI
@@ -65,6 +66,12 @@ public class TrainAPI
 	public ArrayList<TrainInfo> getTrainList(String depPlaceName, String arrPlaceName, String depPlandTime) {
 		ArrayList<TrainInfo> list =
 				getTrainInfo(getValue(arrStation, depPlaceName), getValue(arrStation, arrPlaceName), depPlandTime);
+		
+		list.sort(new Comparator<TrainInfo>() {
+			public int compare(TrainInfo o1, TrainInfo o2) {
+				return o1.getDepplandTime().compareTo(o2.getDepplandTime());
+			}
+		});
 		
 		return list;
 	}

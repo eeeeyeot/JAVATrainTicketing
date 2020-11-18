@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -15,14 +16,18 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import trainInfo.TrainInfo;
-
 //출발지 도착지 출발일
 public class TrainAPI
 {
 	private static TrainAPI	_instance;
 	private static final String SERVICE_KEY	= "wxxasIBZR7Fm76B44Ad9UeATwCDTMDPbD7KYi6y02h953AlV4ei%2FN6yo6%2FwZZ%2BKOyJFH01U47gc7mJ42czfR2A%3D%3D";
 	private static String url = "http://openapi.tago.go.kr/openapi/service/TrainInfoService/";
+	
+	private String[] tmp = {"서울", "용산", "영등포", "광명", "수원", "평택", "천안아산", "천안", "오송",
+			"조치원", "대전", "서대전", "김천", "구미", "김천구미", "대구", "동대구", "포항", "밀양", "구포",
+			"부산", "신경주", "태화강", "울산(통도사)", "마산", "창원중앙", "경산", "논산", "익산", "정읍", "광주송정",
+			"목포", "전주", "순천", "여수EXPO(구,여수역)", "대천", "청량리", "춘천", "제천", "동해", "강릉", "행신",
+			"남춘천" , "부전", "신탄진", "영동", "왜관", "원주", "정동진", "홍성"};
 	
 	static DocumentBuilderFactory	dbFactory;
 	static DocumentBuilder			dBuilder;
@@ -41,7 +46,7 @@ public class TrainAPI
 	}
 	
 	//Singleton
-	static synchronized public TrainAPI getInstance()
+	public static synchronized TrainAPI getInstance()
 	{
 		if(_instance == null)
 			_instance = new TrainAPI();
@@ -52,23 +57,37 @@ public class TrainAPI
 		return _instance;
 	}
 	
+	public Vector<String> getStationTmp() {
+		Vector<String> v = new Vector<String>();
+		for(String s : tmp)
+			v.add(s);
+		
+		return v;
+	}
+	
 	//for Station list
-	public ArrayList<String> getStationNames() {
-		ArrayList<String> list = new ArrayList<String>();
+	public Vector<String> getStationNames() {
+		Vector<String> list = new Vector<String>();
 		for(MyDictionary<String> md : arrStation) {
 			list.add(md.getKey());
 		}
+		
+		list.sort(new Comparator<String>() {
+			public int compare(String o1, String o2) {
+				return o1.compareTo(o2);
+			}
+		});
 		
 		return list;
 	}
 
 	//get train list for ticketing
-	public ArrayList<TrainInfo> getTrainList(String depPlaceName, String arrPlaceName, String depPlandTime) {
-		ArrayList<TrainInfo> list =
+	public ArrayList<TrainVo> getTrainList(String depPlaceName, String arrPlaceName, String depPlandTime) {
+		ArrayList<TrainVo> list =
 				getTrainInfo(getValue(arrStation, depPlaceName), getValue(arrStation, arrPlaceName), depPlandTime);
 		
-		list.sort(new Comparator<TrainInfo>() {
-			public int compare(TrainInfo o1, TrainInfo o2) {
+		list.sort(new Comparator<TrainVo>() {
+			public int compare(TrainVo o1, TrainVo o2) {
 				return o1.getDepplandTime().compareTo(o2.getDepplandTime());
 			}
 		});
@@ -168,9 +187,9 @@ public class TrainAPI
 	}
 
 	//get train informations from open API
-	private ArrayList<TrainInfo> getTrainInfo(String depPlaceId, String arrPlacedId, String depPlandTime)
+	private ArrayList<TrainVo> getTrainInfo(String depPlaceId, String arrPlacedId, String depPlandTime)
 	{
-		ArrayList<TrainInfo> trainInfo = new ArrayList<TrainInfo>();
+		ArrayList<TrainVo> trainInfo = new ArrayList<TrainVo>();
 		try
 		{
 			StringBuilder			urlBuilder	= new StringBuilder(url + "getStrtpntAlocFndTrainInfo");
@@ -197,7 +216,7 @@ public class TrainAPI
 					if (nNode.getNodeType() == Node.ELEMENT_NODE)
 					{
 						Element eElement = (Element) nNode;
-						TrainInfo ti = new TrainInfo();
+						TrainVo ti = new TrainVo();
 						Date date1 = fm.parse(getTagValue("arrplandtime", eElement));
 						//도착시간
 						ti.setArrplandTime(dateToString(date1));

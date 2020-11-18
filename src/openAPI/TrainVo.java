@@ -1,6 +1,6 @@
-package trainInfo;
+package openAPI;
 
-public class TrainInfo
+public class TrainVo
 {
 	private String trainName;
 	private String trainNo;

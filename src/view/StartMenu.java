@@ -45,13 +45,12 @@ public class StartMenu extends JFrame {
 	public StartMenu() {
 		setTitle("기차 예매 프로그램");
 		dao = new TrainDAO();
-		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 800, 500);
 		contentPane = new JPanel();
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-		
+		setResizable(false);
 		
 		
 		JPanel signPanel = new JPanel();

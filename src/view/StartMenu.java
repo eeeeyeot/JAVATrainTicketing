@@ -11,6 +11,8 @@ import java.awt.Point;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -43,15 +45,25 @@ public class StartMenu extends JFrame {
 	private JPasswordField checkPasswordField_up;
 	
 	public StartMenu() {
+		System.out.println("StartMenu created");
 		setTitle("기차 예매 프로그램");
 		dao = new TrainDAO();
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		//setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 800, 500);
 		contentPane = new JPanel();
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		setResizable(false);
 		
+		this.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				System.out.println("Start Menu Closing..");
+			}
+			
+			public void windowClosed(WindowEvent e) {
+				System.out.println("Start Menu Closed");
+			}			
+		});
 		
 		JPanel signPanel = new JPanel();
 		signPanel.setBounds(242, 265, 293, 156);
@@ -279,23 +291,27 @@ public class StartMenu extends JFrame {
 				System.out.println("회원 가입");
 				signUpPanel.setVisible(true);
 			}
+			
 		});
 
 		// 로그인 버튼
 		signinButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (dao.checkLoginData(idTextField_in.getText(), String.valueOf(passwordField_in.getPassword()))) {
-					setVisible(false);
 					new MainMenu().setVisible(true);
+					dispose();
 				} else {
 					showDialog("ID / PW 가 틀렸습니다");
 				}
 			}
 		});
-
 		setLocation(ScreenUtil.getCenterPosition(this));
-		
 	}
+	
+	protected void finalize() throws Throwable {
+		System.out.println("StartMenu destroyed");
+	}
+	
 	
 	void showDialog(String info) {
 		JDialog jd = new JDialog(this, "알림", true);

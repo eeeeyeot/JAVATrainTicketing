@@ -1,6 +1,7 @@
 package openAPI;
 
 import java.net.URLEncoder;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -33,10 +34,11 @@ public class TrainAPI
 	static DocumentBuilder			dBuilder;
 	static Document				doc;
 	
+	DecimalFormat df = new DecimalFormat("#,###");
+	
 	ArrayList<MyDictionary<String>> arrCityCode;
 	ArrayList<MyDictionary<String>> arrTrain;
 	ArrayList<MyDictionary<String>> arrStation;
-	
 	
 	TrainAPI()
 	{
@@ -95,38 +97,6 @@ public class TrainAPI
 		return list;
 	}
 	
-	//get station code from open API
-	//call from getCityCode()
-	private void setStationCode(String cityCode) {
-		try
-		{
-			StringBuilder urlBuilder = new StringBuilder(url + "getCtyAcctoTrainSttnList"); /*URL*/
-	        urlBuilder.append("?" + URLEncoder.encode("ServiceKey","UTF-8") + "=" + SERVICE_KEY); /*Service Key*/
-	        urlBuilder.append("&" + URLEncoder.encode("numOfRows","UTF-8") + "=" + URLEncoder.encode("10", "UTF-8")); /*한 페이지 결과 수*/
-	        urlBuilder.append("&" + URLEncoder.encode("pageNo","UTF-8") + "=" + URLEncoder.encode("1", "UTF-8")); /*페이지 번호*/
-	        urlBuilder.append("&" + URLEncoder.encode("cityCode","UTF-8") + "=" + URLEncoder.encode(cityCode, "UTF-8")); /*시/도ID*/
-	        
-	        doc = getDocument(urlBuilder.toString());
-	        
-	        NodeList nList = doc.getElementsByTagName("item");
-			
-			for(int i = 0; i < nList.getLength(); i++) {
-				Node nNode = nList.item(i);
-				
-				if (nNode.getNodeType() == Node.ELEMENT_NODE)
-				{
-					Element eElement = (Element) nNode;
-					String nodeName = getTagValue("nodename", eElement);
-					String nodeId = getTagValue("nodeid", eElement);
-					arrStation.add(new MyDictionary<String>(nodeName, nodeId));
-				}
-			}
-		} 
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
 
 	//get train code from open API
 	private void getTrainCode() {
@@ -176,7 +146,10 @@ public class TrainAPI
 					String cityCode = getTagValue("citycode", eElement);
 					String cityName = getTagValue("cityname", eElement);
 					arrCityCode.add(new MyDictionary<String>(cityName, cityCode));
-					setStationCode(cityCode);
+					
+					StationThread st = new StationThread(cityCode);
+					st.start();
+					//getStationCode(cityCode);
 				}
 			}
 			
@@ -294,4 +267,48 @@ public class TrainAPI
 		return value;
 	}
 	
+	class StationThread extends Thread {
+		String cityCode;
+		
+		StationThread(String cityCode)
+		{
+			this.cityCode = cityCode;
+		}
+		
+		public void run() {
+			getStationCode();
+		}
+		
+		// get station code from open API
+		// call from getCityCode()
+		private void getStationCode() {
+			try {
+				StringBuilder urlBuilder = new StringBuilder(url + "getCtyAcctoTrainSttnList"); /* URL */
+				urlBuilder.append("?" + URLEncoder.encode("ServiceKey", "UTF-8") + "=" + SERVICE_KEY); /* Service Key */
+				urlBuilder.append("&" + URLEncoder.encode("numOfRows", "UTF-8") + "="
+						+ URLEncoder.encode("10", "UTF-8")); /* 한 페이지 결과 수 */
+				urlBuilder.append("&" + URLEncoder.encode("pageNo", "UTF-8") + "="
+						+ URLEncoder.encode("1", "UTF-8")); /* 페이지 번호 */
+				urlBuilder.append("&" + URLEncoder.encode("cityCode", "UTF-8") + "="
+						+ URLEncoder.encode(cityCode, "UTF-8")); /* 시/도ID */
+
+				doc = getDocument(urlBuilder.toString());
+
+				NodeList nList = doc.getElementsByTagName("item");
+
+				for (int i = 0; i < nList.getLength(); i++) {
+					Node nNode = nList.item(i);
+
+					if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+						Element eElement = (Element) nNode;
+						String nodeName = getTagValue("nodename", eElement);
+						String nodeId = getTagValue("nodeid", eElement);
+						arrStation.add(new MyDictionary<String>(nodeName, nodeId));
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
 }

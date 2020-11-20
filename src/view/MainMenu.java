@@ -74,10 +74,11 @@ public class MainMenu extends JFrame {
 		northPanel.setLayout(gbl_northPanel);
 
 		JPanel imagePanel = new JPanel() {
-			Image icon = new ImageIcon(MainMenu.class.getResource("../image/test.png")).getImage();
+			Image icon = new ImageIcon(MainMenu.class.getResource("../image/korailImage.jpg")).getImage();
 
 			public void paint(Graphics g) {
-				g.drawImage(icon, 0, 0, null);
+				Dimension size = getSize();
+				g.drawImage(icon, 0, 0, size.width, size.height, null);
 			}
 		};
 		GridBagConstraints gbc_imagePanel = new GridBagConstraints();

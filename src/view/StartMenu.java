@@ -45,7 +45,6 @@ public class StartMenu extends JFrame {
 	private JPasswordField checkPasswordField_up;
 
 	public StartMenu() {
-		System.out.println("StartMenu created");
 		setTitle("기차 예매 프로그램");
 		dao = new TrainDAO();
 		// setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

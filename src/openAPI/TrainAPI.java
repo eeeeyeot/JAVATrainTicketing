@@ -82,6 +82,13 @@ public class TrainAPI
 		
 		return list;
 	}
+	
+	public Vector<String> getTrainKind(){
+		Vector<String> list = new Vector<String>();
+		for(MyDictionary<String> md : arrTrain)
+			list.add(md.getKey());
+		return list; 
+	}
 
 	//get train list for ticketing
 	public ArrayList<TrainVo> getTrainList(String depPlaceName, String arrPlaceName, String depPlandTime) {
@@ -247,8 +254,9 @@ public class TrainAPI
 		StringBuffer	sb	= new StringBuffer();
 		Calendar		cal	= Calendar.getInstance();
 		cal.setTime(date);
-		sb.append(cal.get(Calendar.YEAR)).append("년 ").append(cal.get(Calendar.MONTH) + 1).append("월 ").append(cal.get(Calendar.DAY_OF_MONTH))
-				.append("일 ").append(cal.get(Calendar.HOUR_OF_DAY)).append("시 ").append(cal.get(Calendar.MINUTE)).append("분 ");
+		sb.append(cal.get(Calendar.YEAR)).append(String.format("%02d", cal.get(Calendar.MONTH) + 1)).append(String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)))
+			.append(String.format("%02d", cal.get(Calendar.HOUR_OF_DAY))).append(String.format("%02d", cal.get(Calendar.MINUTE)));
+		
 
 		return sb.toString();
 	}

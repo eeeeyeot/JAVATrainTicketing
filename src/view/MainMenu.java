@@ -15,6 +15,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -30,6 +31,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import openAPI.TrainAPI;
+import openAPI.TrainVo;
 import util.ScreenUtil;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -43,7 +46,7 @@ public class MainMenu extends JFrame {
 	// public static void main(String[] args) { new MainMenu().setVisible(true); }
 
 	public MainMenu() {
-		setLocation(ScreenUtil.getCenterPosition(this));
+		
 		setTitle("기차 예매 프로그램");
 		// setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1000, 700);
@@ -610,6 +613,16 @@ public class MainMenu extends JFrame {
 		// reservTicketTabbedPane.setTitleAt(1, "왕복");
 
 		JButton reservationButton = new JButton("예 매");
+		reservationButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String depText = depComboBox.getComboBoxText();
+				String arrText = arrComboBox.getComboBoxText();
+				String date = yearTextField.getText() + monthTextField.getText() + dayTextField.getText();
+				ArrayList<TrainVo> list = TrainAPI.getInstance().getTrainList(depText, arrText, date);
+				new TrainInquiry(list).setVisible(true);
+				setVisible(false);
+			}
+		});
 		reservationButton.setFont(new Font("맑은 고딕", Font.PLAIN, 20));
 		reservTicketPanel.add(reservationButton, BorderLayout.SOUTH);
 		reservTicketTabbedPane.setTabComponentAt(1, roundTripLabel);
@@ -630,6 +643,7 @@ public class MainMenu extends JFrame {
 		ticketingTabbedPane.add(ticketConfirmPanel);
 		ticketingTabbedPane.setTabComponentAt(2, ticketConfirmLabel);
 		// #####################################################
+		setLocation(ScreenUtil.getCenterPosition(this));
 	}
 
 	private void numberFormatLimit(KeyEvent e, int limit) {

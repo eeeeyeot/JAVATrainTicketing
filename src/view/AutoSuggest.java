@@ -17,9 +17,9 @@ import openAPI.TrainAPI;
 
 @SuppressWarnings("serial")
 public class AutoSuggest extends JPanel{
-	JTextField tf;
-	JComboBox<String> combo;
-	Vector<String> v;
+	private JTextField tf;
+	private JComboBox<String> combo;
+	private Vector<String> v;
 	
 	AutoSuggest(){
 		v = TrainAPI.getInstance().getStationTmp();
@@ -61,5 +61,9 @@ public class AutoSuggest extends JPanel{
 		}
 		
 		return m;
+	}
+	
+	public String getComboBoxText() {
+		return tf.getText();
 	}
 }

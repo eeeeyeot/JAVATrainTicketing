@@ -214,7 +214,7 @@ public class TrainAPI
 	}
 	
 	//initialize doc
-	private Document getDocument(String url) {
+	private synchronized Document getDocument(String url) {
 		try {
 			dbFactory	= DocumentBuilderFactory.newInstance();
 			dBuilder	= dbFactory.newDocumentBuilder();

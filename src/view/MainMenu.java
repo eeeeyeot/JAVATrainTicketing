@@ -3,11 +3,11 @@ package view;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics;
+//import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.Image;
+//import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -18,7 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import javax.swing.ImageIcon;
+//import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -73,20 +73,20 @@ public class MainMenu extends JFrame {
 		gbl_northPanel.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
 		northPanel.setLayout(gbl_northPanel);
 
-		JPanel imagePanel = new JPanel() {
-			Image icon = new ImageIcon(MainMenu.class.getResource("../image/korailImage.jpg")).getImage();
-
-			public void paint(Graphics g) {
-				Dimension size = getSize();
-				g.drawImage(icon, 0, 0, size.width, size.height, null);
-			}
-		};
+		/*
+		 * JPanel imagePanel = new JPanel() { Image icon = new
+		 * ImageIcon(MainMenu.class.getResource("../image/korailImage.jpg")).getImage();
+		 * 
+		 * public void paint(Graphics g) { Dimension size = getSize(); g.drawImage(icon,
+		 * 0, 0, size.width, size.height, null); } };
+		 */
+		
 		GridBagConstraints gbc_imagePanel = new GridBagConstraints();
 		gbc_imagePanel.fill = GridBagConstraints.BOTH;
 		gbc_imagePanel.insets = new Insets(0, 0, 0, 5);
 		gbc_imagePanel.gridx = 0;
 		gbc_imagePanel.gridy = 0;
-		northPanel.add(imagePanel, gbc_imagePanel);
+		//northPanel.add(imagePanel, gbc_imagePanel);
 
 		JLabel korailLabel = new JLabel("Korail");
 		korailLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 40));

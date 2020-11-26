@@ -31,6 +31,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import database.UserVo;
 import openAPI.TrainAPI;
 import openAPI.TrainVo;
 import util.ScreenUtil;
@@ -41,7 +42,9 @@ import java.awt.FlowLayout;
 @SuppressWarnings("serial")
 public class MainMenu extends JFrame {
 
+	private UserVo userVo;
 	private JPanel contentPane;
+	
 
 	// public static void main(String[] args) { new MainMenu().setVisible(true); }
 
@@ -176,6 +179,9 @@ public class MainMenu extends JFrame {
 		gbl_arrComboBox.columnWeights = new double[] { Double.MIN_VALUE };
 		gbl_arrComboBox.rowWeights = new double[] { Double.MIN_VALUE };
 		arrComboBox.setLayout(gbl_arrComboBox);
+		
+		depComboBox.setDefault("서울");
+		arrComboBox.setDefault("대전");
 
 		JPanel selectDepDatePanel = new JPanel();
 		GridBagConstraints gbc_selectDepDatePanel = new GridBagConstraints();
@@ -605,13 +611,15 @@ public class MainMenu extends JFrame {
 				increaseCount(seniorCntTextField);
 			}
 		});
-
+		
 		JPanel roundTripPanel = new JPanel();
 		JLabel roundTripLabel = new JLabel("왕복");
 		roundTripLabel.setPreferredSize(new Dimension(380, 30));
 		reservTicketTabbedPane.add(roundTripPanel);
 		// reservTicketTabbedPane.setTitleAt(1, "왕복");
 
+		JFrame thisObj = this;
+		
 		JButton reservationButton = new JButton("예 매");
 		reservationButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -619,7 +627,9 @@ public class MainMenu extends JFrame {
 				String arrText = arrComboBox.getComboBoxText();
 				String date = yearTextField.getText() + monthTextField.getText() + dayTextField.getText();
 				ArrayList<TrainVo> list = TrainAPI.getInstance().getTrainList(depText, arrText, date);
-				new TrainInquiry(list).setVisible(true);
+				int personnel = 0;
+				personnel += Integer.parseInt(childCntTextField.getText()) + Integer.parseInt(adultCntTextField.getText()) + Integer.parseInt(seniorCntTextField.getText()); 
+				new TrainInquiry(list, thisObj, personnel).setVisible(true);
 				setVisible(false);
 			}
 		});
@@ -646,6 +656,11 @@ public class MainMenu extends JFrame {
 		setLocation(ScreenUtil.getCenterPosition(this));
 	}
 
+	public MainMenu(UserVo userVo) {
+		this();
+		this.userVo = userVo;
+	}
+	
 	private void numberFormatLimit(KeyEvent e, int limit) {
 		char c = e.getKeyChar();
 		if (!Character.isDigit(c)) {

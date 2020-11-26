@@ -22,7 +22,7 @@ public class AutoSuggest extends JPanel{
 	private Vector<String> v;
 	
 	AutoSuggest(){
-		v = TrainAPI.getInstance().getStationTmp();
+		v = TrainAPI.getInstance().getStationNames();
 		setLayout(new GridBagLayout());
 		
 		combo = new JComboBox<String>(v);
@@ -65,5 +65,9 @@ public class AutoSuggest extends JPanel{
 	
 	public String getComboBoxText() {
 		return tf.getText();
+	}
+	
+	public void setDefault(String station) {
+		tf.setText(station);
 	}
 }

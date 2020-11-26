@@ -293,8 +293,9 @@ public class StartMenu extends JFrame {
 		// 로그인 버튼
 		signinButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (dao.checkLoginData(idTextField_in.getText(), String.valueOf(passwordField_in.getPassword()))) {
-					new MainMenu().setVisible(true);
+				UserVo userVo;
+				if ((userVo = dao.checkLoginData(idTextField_in.getText(), String.valueOf(passwordField_in.getPassword()))) != null) {
+					new MainMenu(userVo).setVisible(true);
 					dispose();
 				} else {
 					showDialog("ID / PW 가 틀렸습니다");

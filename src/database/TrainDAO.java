@@ -5,6 +5,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @SuppressWarnings("unused")
 public class TrainDAO
@@ -45,7 +47,8 @@ public class TrainDAO
 		return true;
 	}
 	
-	public boolean checkLoginData(String id, String pw) {
+	public UserVo checkLoginData(String id, String pw) {
+		UserVo userVo = null;
 		try {
 			String sql = "select * from userdata "
 					+ "where user_id = '" + id + "' and user_pw = '" + pw + "'";
@@ -53,15 +56,21 @@ public class TrainDAO
 			rs = stmt.executeQuery(sql);
 			
 			if(!rs.next())
-				return false;
+				return null;
+			
+			SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			Date register = sf.parse(rs.getString("register_date"));
+			
+			userVo = new UserVo(rs.getString("user_id"), rs.getString("user_pw"), 
+					rs.getString("uname"), rs.getString("contact"), register);
 		}
 		catch(Exception e) 
 		{
 			e.printStackTrace();
-			return false;
+			return null;
 		}
 		
-		return true;
+		return userVo;
 	}
 	
 	public void connDB() {

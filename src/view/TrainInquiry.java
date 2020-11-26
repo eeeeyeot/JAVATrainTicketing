@@ -24,6 +24,8 @@ import javax.swing.border.TitledBorder;
 
 import openAPI.TrainAPI;
 import openAPI.TrainVo;
+import util.ScreenUtil;
+
 import javax.swing.JLayeredPane;
 import java.awt.BorderLayout;
 
@@ -31,14 +33,20 @@ import java.awt.BorderLayout;
 public class TrainInquiry extends JFrame implements ActionListener{
 
 	private static final Color SKY_BLUE = new Color(51,153,255);
+	private ArrayList<Integer> seats;
+	private int personnel;
+	
+	private JFrame parent;
 	
 	private JPanel contentPane;
 	private ArrayList<TrainVo> trainList;
 	private JPanel trainInfomationsPanel;
+	private JLayeredPane refLayeredPane;
+	private JPanel refTrainList;
 	
-	public static void main(String[] args) {
-		new TrainInquiry().setVisible(true);
-	}
+//	public static void main(String[] args) {
+//		new TrainInquiry().setVisible(true);
+//	}
 	
 	public TrainInquiry() {
 		setTitle("기차 조회");
@@ -77,6 +85,7 @@ public class TrainInquiry extends JFrame implements ActionListener{
 		gbc_backButton.gridx = 0;
 		gbc_backButton.gridy = 0;
 		titlePanel.add(backButton, gbc_backButton);
+		backButton.addActionListener(this);
 		
 		JLabel inquiryTitleLabel = new JLabel("열차 조회");
 		inquiryTitleLabel.setFont(new Font("굴림", Font.PLAIN, 20));
@@ -117,7 +126,7 @@ public class TrainInquiry extends JFrame implements ActionListener{
 		layeredPane.setLayout(gbl_layeredPane);
 		
 		JPanel trainListPanel = new JPanel();
-		layeredPane.setLayer(trainListPanel, 0);
+		layeredPane.setLayer(trainListPanel, 2);
 		GridBagConstraints gbc_trainListPanel = new GridBagConstraints();
 		gbc_trainListPanel.fill = GridBagConstraints.BOTH;
 		gbc_trainListPanel.gridx = 0;
@@ -360,9 +369,11 @@ public class TrainInquiry extends JFrame implements ActionListener{
 		}
 		
 		Vector<String> trainKindList = TrainAPI.getInstance().getTrainKind();
+		trainCategoryBox.addItem("모두");
 		for(String s : trainKindList)
 			trainCategoryBox.addItem(s);
 		
+		trainCategoryBox.addActionListener(this);
 		
 		JButton reservButton = new JButton("예 매");
 		reservButton.setFont(new Font("굴림", Font.BOLD, 20));
@@ -371,47 +382,86 @@ public class TrainInquiry extends JFrame implements ActionListener{
 		gbc_reservButton.gridx = 0;
 		gbc_reservButton.gridy = 3;
 		contentPane.add(reservButton, gbc_reservButton);
+		
+		refLayeredPane = layeredPane;
+		refTrainList = trainListPanel;
+		setLocation(ScreenUtil.getCenterPosition(this));
 	}
 	
-	public TrainInquiry(ArrayList<TrainVo> list) {
+	public TrainInquiry(ArrayList<TrainVo> list, JFrame parent, int personnel) {
 		this();
 		trainList = list;
+		this.parent = parent;
 		initScrollPane(list, "모두");
+		this.personnel = personnel;
+		seats = new ArrayList<Integer>(personnel);
 	}
 	
-	private void initScrollPane(ArrayList<TrainVo> list, String kind) {
+	private void initScrollPane(ArrayList<TrainVo> list, String type) {
 		trainInfomationsPanel.removeAll();
 		System.out.println("모든 열차 정보 수 : " + trainList.size());
 		int cnt = 0;
 		for(TrainVo vo : list) {
-			if(kind.equals(vo.getName()) || kind.equals("모두")) {
-				trainInfomationsPanel.add(new TrainInfomation(vo));
+			if(type.equals(vo.getName()) || type.equals("모두")) {
+				TrainInfomation ti = new TrainInfomation(vo);
+				ti.addButtonEvent(this);
+				trainInfomationsPanel.add(ti);
 				cnt++;
 			}
 		}
-		trainInfomationsPanel.repaint();
-		System.out.println(kind + " 열차 정보 수 : " + cnt);
+		trainInfomationsPanel.updateUI();
+
+		System.out.println(type + " 열차 정보 수 : " + cnt);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() instanceof JButton) {
 			if(e.getActionCommand().equals("예 매")) 
 			{
-				
+				if(seats.size() < personnel) {
+					showDialog("<html>인원 수 보다 좌석의 수가 적습니다.<br><center>나머지 좌석은 무작위로 선택되거나, 입석으로 처리됩니다.</center></html>");
+				}
 			}
-			else 
+			else if(e.getActionCommand().contains("원")) 
 			{
+				refLayeredPane.setLayer(refTrainList, 0);
+			}
+			else if(e.getActionCommand().contains("뒤로") && (refLayeredPane.getComponentCountInLayer(0) > 0))
+				refLayeredPane.setLayer(refTrainList, 2);
+			else if(e.getActionCommand().contains("뒤로") && (refLayeredPane.getComponentCountInLayer(2) > 0)) 
+			{
+				parent.setVisible(true);
+				this.dispose();
+			}
+			else
+			{
+				System.out.println(e.getActionCommand());
 				JButton btn = (JButton)e.getSource();
 				Color color = btn.getBackground();
-				if(color.equals(Color.RED))
+				int seat = Integer.parseInt(btn.getActionCommand());
+				if(color.equals(Color.RED) && seats.size() < personnel) {
 					btn.setBackground(SKY_BLUE);
-				else
+					seats.add(seat);
+				}
+				else if (color.equals(SKY_BLUE)) {
 					btn.setBackground(Color.RED);
-			}
+					seats.remove(seat);
+				}
+			}	
+		}
+		else if(e.getSource() instanceof JComboBox)
+		{
+			String type = ((JComboBox<String>)e.getSource()).getSelectedItem().toString();
+			initScrollPane(new ArrayList<TrainVo>(trainList), type);
 		}
 		else 
 		{
 			
 		}
+	}
+	
+	private void showDialog(String msg) {
+		
 	}
 }

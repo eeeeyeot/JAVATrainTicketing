@@ -1,5 +1,6 @@
 package openAPI;
 
+import java.io.*;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -23,13 +24,7 @@ public class TrainAPI
 	private static TrainAPI	_instance;
 	private static final String SERVICE_KEY	= "wxxasIBZR7Fm76B44Ad9UeATwCDTMDPbD7KYi6y02h953AlV4ei%2FN6yo6%2FwZZ%2BKOyJFH01U47gc7mJ42czfR2A%3D%3D";
 	private static String url = "http://openapi.tago.go.kr/openapi/service/TrainInfoService/";
-	
-	private String[] tmp = {"서울", "용산", "영등포", "광명", "수원", "평택", "천안아산", "천안", "오송",
-			"조치원", "대전", "서대전", "김천", "구미", "김천구미", "대구", "동대구", "포항", "밀양", "구포",
-			"부산", "신경주", "태화강", "울산(통도사)", "마산", "창원중앙", "경산", "논산", "익산", "정읍", "광주송정",
-			"목포", "전주", "순천", "여수EXPO(구,여수역)", "대천", "청량리", "춘천", "제천", "동해", "강릉", "행신",
-			"남춘천" , "부전", "신탄진", "영동", "왜관", "원주", "정동진", "홍성"};
-	
+
 	static DocumentBuilderFactory	dbFactory;
 	static DocumentBuilder			dBuilder;
 	static Document				doc;
@@ -40,31 +35,25 @@ public class TrainAPI
 	ArrayList<MyDictionary<String>> arrTrain;
 	ArrayList<MyDictionary<String>> arrStation;
 	
+	ArrayList<StationThread> threads;
+
 	TrainAPI()
 	{
 		arrCityCode = new ArrayList<MyDictionary<String>>();
 		arrTrain = new ArrayList<MyDictionary<String>>();
 		arrStation = new ArrayList<MyDictionary<String>>();
+		
+		threads = new ArrayList<StationThread>();
 	}
 	
 	//Singleton
 	public static synchronized TrainAPI getInstance()
 	{
-		if(_instance == null)
+		if(_instance == null) {
 			_instance = new TrainAPI();
-		
-		_instance.getCityCode();
-		_instance.getTrainCode();
-		
+			_instance.readFiles();
+		}
 		return _instance;
-	}
-	
-	public Vector<String> getStationTmp() {
-		Vector<String> v = new Vector<String>();
-		for(String s : tmp)
-			v.add(s);
-		
-		return v;
 	}
 	
 	//for Station list
@@ -91,9 +80,39 @@ public class TrainAPI
 	}
 
 	//get train list for ticketing
+	@SuppressWarnings("resource")
 	public ArrayList<TrainVo> getTrainList(String depPlaceName, String arrPlaceName, String depPlandTime) {
-		ArrayList<TrainVo> list =
-				getTrainInfo(getValue(arrStation, depPlaceName), getValue(arrStation, arrPlaceName), depPlandTime);
+		ArrayList<TrainVo> list = null;
+		String directory = "./file/" + depPlaceName + " " + arrPlaceName + " " + depPlandTime + ".txt";
+		try {
+			list = new ArrayList<TrainVo>();
+			BufferedReader br = new BufferedReader(new FileReader(directory));
+			String currentLine;
+			while((currentLine = br.readLine()) != null) {
+				String[] str = currentLine.split(" ");
+				TrainVo vo = new TrainVo(str[0], str[1], str[2], str[3]);
+				list.add(vo);
+			}
+			System.out.println(directory + " read");
+		}
+		catch (FileNotFoundException e) {
+			list = getTrainInfo(getValue(arrStation, depPlaceName), getValue(arrStation, arrPlaceName), depPlandTime);
+			try {
+				BufferedWriter fw = new BufferedWriter(new FileWriter(directory, true));
+				for(TrainVo vo : list) {
+					fw.write(vo.toFileString() + "\n");
+				}
+				fw.flush();
+				fw.close();
+				System.out.println(directory + " write");
+			}
+			catch(Exception ee) {
+				ee.printStackTrace();
+			}
+		}
+		catch (Exception e) {
+			
+		}
 		
 		list.sort(new Comparator<TrainVo>() {
 			public int compare(TrainVo o1, TrainVo o2) {
@@ -104,6 +123,60 @@ public class TrainAPI
 		return list;
 	}
 	
+	@SuppressWarnings("resource")
+	private void readFile(String directory, ArrayList<MyDictionary<String>> arr) {
+		directory = "./file/" + directory;
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(directory));
+			String currentLine;
+			while((currentLine = br.readLine()) != null) {
+				String[] str = currentLine.split(" ");
+				arr.add(new MyDictionary<String>(str[0], str[1]));
+			}
+			System.out.println(directory + " read");
+		}
+		catch(FileNotFoundException e) {
+			if(arr.equals(arrCityCode))
+				_instance.getCityCode();
+			else if(arr.equals(arrTrain))
+				_instance.getTrainCode();
+			else if(arr.equals(arrStation)) {
+				boolean allThreadFinish = false;
+				
+				while(!allThreadFinish) {
+					allThreadFinish = true;
+					for(StationThread st : threads) {
+						if(st.isAlive()) {
+							allThreadFinish = false;
+							break;
+						}
+					}
+				}
+			}
+			
+			try {
+				BufferedWriter fw = new BufferedWriter(new FileWriter(directory, true));
+				for(MyDictionary<String> md : arr) {
+					fw.write(md.getKey() + " " + md.getValue() + "\n");
+				}
+				fw.flush();
+				fw.close();
+				System.out.println(directory + " write");
+			}
+			catch(Exception ee) {
+				ee.printStackTrace();
+			}
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void readFiles() {
+		readFile("CityCode.txt", arrCityCode);
+		readFile("TrainCode.txt", arrTrain);
+		readFile("StationCode.txt", arrStation);
+	}
 
 	//get train code from open API
 	private void getTrainCode() {
@@ -155,6 +228,7 @@ public class TrainAPI
 					arrCityCode.add(new MyDictionary<String>(cityName, cityCode));
 					
 					StationThread st = new StationThread(cityCode);
+					threads.add(st);
 					st.start();
 					//getStationCode(cityCode);
 				}
@@ -256,7 +330,6 @@ public class TrainAPI
 		cal.setTime(date);
 		sb.append(cal.get(Calendar.YEAR)).append(String.format("%02d", cal.get(Calendar.MONTH) + 1)).append(String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)))
 			.append(String.format("%02d", cal.get(Calendar.HOUR_OF_DAY))).append(String.format("%02d", cal.get(Calendar.MINUTE)));
-		
 
 		return sb.toString();
 	}

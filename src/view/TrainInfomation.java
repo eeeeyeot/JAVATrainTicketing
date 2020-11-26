@@ -2,6 +2,7 @@ package view;
 
 import javax.swing.JPanel;
 import java.awt.GridLayout;
+import java.awt.event.ActionListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -59,13 +60,14 @@ public class TrainInfomation extends JPanel {
 	public TrainInfomation(TrainVo vo) {
 		this();
 		
-		trainIdentityLabel.setText("<html>" + vo.getName() + "<br>" +
-		vo.getTrainNo() + "</html>");
+		trainIdentityLabel.setText("<html>" + vo.getName() + "<br><center>" + vo.getTrainNo() + "</center></html>");
 		depplandTimeLabel.setText(toDate(vo.getDepplandTime()));
 		arrplandTimeLabel.setText(toDate(vo.getArrplandTime()));
 	}
 	
-	
+	public void addButtonEvent(ActionListener actionListener) {
+		priceButton.addActionListener(actionListener);
+	}
 	
 	public String toDate(String time) {
 		StringBuilder sb = new StringBuilder();

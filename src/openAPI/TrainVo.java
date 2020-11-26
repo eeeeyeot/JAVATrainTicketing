@@ -11,6 +11,14 @@ public class TrainVo
 	private String depplandTime;
 	private String arrplandTime;
 	
+	public TrainVo() {}
+	public TrainVo(String trainName, String trainNo, String depplandTime, String arrplandTime) {
+		this.trainName = trainName;
+		this.trainNo = trainNo;
+		this.depplandTime = depplandTime;
+		this.arrplandTime = arrplandTime;
+	}
+	
 	public String getName() { return trainName; }
 	public void setName(String name) { this.trainName = name; }
 	
@@ -24,7 +32,11 @@ public class TrainVo
 	public void setArrplandTime(String arrplandTime) { this.arrplandTime = arrplandTime; }
 	
 	public String toString() {
-		return "[기차 이름 : " + trainName + "][기차 번호 : " + trainNo + "][출발 시간 : " + dateFormatToString(depplandTime) + "][도착 시간 : " + dateFormatToString(arrplandTime) + "]";
+		return trainName + " "+ trainNo + " " + dateFormatToString(depplandTime) + " " + dateFormatToString(arrplandTime);
+	}
+	
+	public String toFileString() {
+		return trainName + " "+ trainNo + " " + depplandTime + " " + arrplandTime;
 	}
 	
 	public String dateFormatToString(String date) {

@@ -2,6 +2,7 @@ package view;
 
 import javax.swing.JPanel;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -18,13 +19,17 @@ import javax.swing.border.TitledBorder;
 import openAPI.*;
 
 @SuppressWarnings("serial")
-public class TrainInfomation extends JPanel {
+public class TrainInformation extends JPanel implements ActionListener{
 	private JLabel trainIdentityLabel;
 	private JLabel depplandTimeLabel;
 	private JLabel arrplandTimeLabel;
 	private JButton priceButton;
 	
-	public TrainInfomation() {
+	private TrainInquiry parent;
+	private TrainVo vo;
+
+	
+	public TrainInformation() {
 		setForeground(Color.BLACK);
 		setBorder(null);
 		setLayout(new GridLayout(0, 4, 0, 0));
@@ -54,19 +59,16 @@ public class TrainInfomation extends JPanel {
 		arrplandTimeLabel.setBorder(titled);
 		priceButton.setBorder(titled);
 		
-		
+		priceButton.addActionListener(this);
 	}
 	
-	public TrainInfomation(TrainVo vo) {
+	public TrainInformation(TrainVo vo, TrainInquiry parent) {
 		this();
-		
-		trainIdentityLabel.setText("<html>" + vo.getName() + "<br><center>" + vo.getTrainNo() + "</center></html>");
+		this.parent = parent;
+		this.vo = vo;
+		trainIdentityLabel.setText("<html>" + vo.getTrainName() + "<br><center>" + vo.getTrainNo() + "</center></html>");
 		depplandTimeLabel.setText(toDate(vo.getDepplandTime()));
 		arrplandTimeLabel.setText(toDate(vo.getArrplandTime()));
-	}
-	
-	public void addButtonEvent(ActionListener actionListener) {
-		priceButton.addActionListener(actionListener);
 	}
 	
 	public String toDate(String time) {
@@ -78,6 +80,12 @@ public class TrainInfomation extends JPanel {
 		sb.append(String.format("%02d", cal.get(Calendar.HOUR_OF_DAY))).append(" : ").append(String.format("%02d", cal.get(Calendar.MINUTE)));
 		
 		return sb.toString();
+	}
+	
+	public void actionPerformed(ActionEvent e) {
+		//선택된 TrainVo를 가져와야함
+		parent.setLayer(0);
+		parent.setCurrentTrainVo(vo);
 	}
 }
 

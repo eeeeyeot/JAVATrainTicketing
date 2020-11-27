@@ -90,13 +90,13 @@ public class TrainAPI
 			String currentLine;
 			while((currentLine = br.readLine()) != null) {
 				String[] str = currentLine.split(" ");
-				TrainVo vo = new TrainVo(str[0], str[1], str[2], str[3]);
+				TrainVo vo = new TrainVo(str[0], str[1], str[2], str[3], depPlaceName, arrPlaceName);
 				list.add(vo);
 			}
 			System.out.println(directory + " read");
 		}
 		catch (FileNotFoundException e) {
-			list = getTrainInfo(getValue(arrStation, depPlaceName), getValue(arrStation, arrPlaceName), depPlandTime);
+			list = getTrainInfo(depPlaceName, arrPlaceName, depPlandTime);
 			try {
 				BufferedWriter fw = new BufferedWriter(new FileWriter(directory, true));
 				for(TrainVo vo : list) {
@@ -241,8 +241,11 @@ public class TrainAPI
 	}
 
 	//get train informations from open API
-	private ArrayList<TrainVo> getTrainInfo(String depPlaceId, String arrPlacedId, String depPlandTime)
+	private ArrayList<TrainVo> getTrainInfo(String depPlace, String arrPlace, String depPlandTime)
 	{
+		String depPlaceId = getValue(arrStation, depPlace);
+		String arrPlaceId = getValue(arrStation, arrPlace);
+		
 		ArrayList<TrainVo> trainInfo = new ArrayList<TrainVo>();
 		try
 		{
@@ -251,7 +254,7 @@ public class TrainAPI
 			urlBuilder.append("&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("10", "UTF-8")); /* 한 페이지 결과 수 */
 			urlBuilder.append("&" + URLEncoder.encode("pageNo", "UTF-8") + "=" + URLEncoder.encode("1", "UTF-8")); /* 페이지 번호 */
 			urlBuilder.append("&" + URLEncoder.encode("depPlaceId", "UTF-8") + "=" + URLEncoder.encode(depPlaceId, "UTF-8")); /* 출발기차역ID */
-			urlBuilder.append("&" + URLEncoder.encode("arrPlaceId", "UTF-8") + "=" + URLEncoder.encode(arrPlacedId, "UTF-8")); /* 도착기차역ID */
+			urlBuilder.append("&" + URLEncoder.encode("arrPlaceId", "UTF-8") + "=" + URLEncoder.encode(arrPlaceId, "UTF-8")); /* 도착기차역ID */
 			urlBuilder.append("&" + URLEncoder.encode("depPlandTime", "UTF-8") + "=" + URLEncoder.encode(depPlandTime, "UTF-8")); /* 출발일 */
 			
 			for(MyDictionary<String> md : arrTrain)
@@ -281,6 +284,10 @@ public class TrainAPI
 						ti.setName(getTagValue("traingradename", eElement));
 						//기차 번호
 						ti.setTrainNo(getTagValue("trainno", eElement));
+						//출발역
+						ti.setDepPlace(depPlace);
+						//도착역
+						ti.setArrPlace(arrPlace);
 						
 						trainInfo.add(ti);
 					}

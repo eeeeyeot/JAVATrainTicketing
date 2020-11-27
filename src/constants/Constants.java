@@ -16,6 +16,4 @@ public class Constants {
 		
 		return sb.toString();
 	}
-	
-	
 }

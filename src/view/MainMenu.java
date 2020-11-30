@@ -11,8 +11,6 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,11 +29,14 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import database.TrainDAO;
 import database.UserVo;
 import openAPI.TrainAPI;
 import openAPI.TrainVo;
 import util.ScreenUtil;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.ActionEvent;
 import java.awt.FlowLayout;
 
@@ -45,13 +46,9 @@ public class MainMenu extends JFrame {
 	private UserVo userVo;
 	private JPanel contentPane;
 	
-
-	// public static void main(String[] args) { new MainMenu().setVisible(true); }
-
 	public MainMenu() {
-		
 		setTitle("기차 예매 프로그램");
-		// setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1000, 700);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -59,17 +56,13 @@ public class MainMenu extends JFrame {
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setResizable(false);
 
-		this.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
-				System.out.println("Main Menu Closing..");
-				System.exit(0);
-			}
-
-			public void windowClosed(WindowEvent e) {
-				System.out.println("Main Menu Closed");
+		this.addComponentListener(new ComponentAdapter() {
+			public void componentShown(ComponentEvent e)
+			{
+				UpdateTicket();
 			}
 		});
-
+		
 		JPanel northPanel = new JPanel();
 		contentPane.add(northPanel, BorderLayout.NORTH);
 		GridBagLayout gbl_northPanel = new GridBagLayout();
@@ -620,17 +613,22 @@ public class MainMenu extends JFrame {
 
 		JFrame thisObj = this;
 		
-		JButton reservationButton = new JButton("예 매");
+		JButton reservationButton = new JButton("열차 조회");
 		reservationButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String depText = depComboBox.getComboBoxText();
-				String arrText = arrComboBox.getComboBoxText();
-				String date = yearTextField.getText() + monthTextField.getText() + dayTextField.getText();
-				ArrayList<TrainVo> list = TrainAPI.getInstance().getTrainList(depText, arrText, date);
-				int personnel = 0;
-				personnel += Integer.parseInt(childCntTextField.getText()) + Integer.parseInt(adultCntTextField.getText()) + Integer.parseInt(seniorCntTextField.getText()); 
-				new TrainInquiry(list, thisObj, personnel).setVisible(true);
-				setVisible(false);
+				int personnel = Integer.parseInt(childCntTextField.getText()) + Integer.parseInt(adultCntTextField.getText()) + Integer.parseInt(seniorCntTextField.getText());
+				if(personnel > 0) { 
+					String depText = depComboBox.getComboBoxText();
+					String arrText = arrComboBox.getComboBoxText();
+					String date = yearTextField.getText() + monthTextField.getText() + dayTextField.getText();
+					ArrayList<TrainVo> list = TrainAPI.getInstance().getTrainList(depText, arrText, date);
+					new TrainInquiry(list, thisObj, personnel).setVisible(true);
+					setVisible(false);
+				}else
+				{
+					String msg = "인원의 수가 0명입니다.";
+					showDialog(msg);
+				}
 			}
 		});
 		reservationButton.setFont(new Font("맑은 고딕", Font.PLAIN, 20));
@@ -659,6 +657,12 @@ public class MainMenu extends JFrame {
 	public MainMenu(UserVo userVo) {
 		this();
 		this.userVo = userVo;
+	}
+	
+	public void addReservation(String ticketId) {
+		//add reservation information into DB
+		TrainDAO dao = TrainDAO.getInstance();
+		dao.insertReservationData(userVo.getId(), ticketId);
 	}
 	
 	private void numberFormatLimit(KeyEvent e, int limit) {
@@ -777,5 +781,17 @@ public class MainMenu extends JFrame {
 		else if (tmp > 9)
 			tf.setText("9");
 	}
-
+	
+	private void showDialog(String msg) {
+		@SuppressWarnings("unused")
+		NoticeDialog nd = new NoticeDialog(msg, this);
+	}
+	
+	private void UpdateTicket() 
+	{
+		@SuppressWarnings("unused")
+		TrainDAO dao = TrainDAO.getInstance();
+		
+		//TicketInformation 승차권확인 탭에 추가
+	}
 }

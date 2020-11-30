@@ -5,12 +5,19 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+
+import openAPI.TrainVo;
 
 @SuppressWarnings("unused")
 public class TrainDAO
 {
+	private static TrainDAO instance = null;
+	
 	String driver = "oracle.jdbc.driver.OracleDriver";
 	String url = "jdbc:oracle:thin:@localhost:1521/xe";
 	String user = "green";
@@ -21,7 +28,7 @@ public class TrainDAO
 	private ResultSet rs;
 	private ResultSetMetaData rsmd;
 	
-	public TrainDAO(){
+	private TrainDAO(){
 		try {
 			connDB();
 		}
@@ -30,12 +37,62 @@ public class TrainDAO
 		}
 	}
 	
-	public boolean inputUserData(UserVo u)
-	{
+	public static TrainDAO getInstance() {
+		if(instance == null)
+			instance = new TrainDAO();
+		
+		return instance;
+	}
+	
+	public ArrayList<TicketVo> getTicketList(String userId) {
+		ArrayList<TicketVo> list = new ArrayList<TicketVo>();
+		
 		try {
-			String sql = "insert into userdata values ('" + u.getId() + "', '" + u.getPw() + 
-					"', '" + u.getName() + "', '" + u.getContact() + 
-					"', to_date('" + u.getRegister() + "', '" + "yyyyMMddHH24MIss'))";
+			String sql = "SELECT t.TICKET_ID, t.DEPPLAND_PLACE, t.ARRPLAND_PLACE, t.TRAIN_NAME, t.CAR_NUMBER, t.SEAT, " + 
+					"t.DEPPLAND_TIME, t.ARRPLAND_TIME, t.PRICE, t.TICKETING_DAY, t.TICKET_TYPE, t.TERM, t.EFFECTIVE_DATE, t.EXPIRATION_DATE " + 
+					"FROM TICKET t, RESERVATION r " + 
+					"WHERE r.USER_ID = '" + userId + "' AND r.TICKET_ID = t.TICKET_ID";
+			System.out.println(sql);
+			rs = stmt.executeQuery(sql);
+			
+			while(rs.next()) {
+				TicketVo vo = new TicketVo();
+				vo.setTicket_id(rs.getString("TICKET_ID"));
+				vo.setDeppland_place(rs.getString("DEPPLAND_PLACE"));
+				vo.setArrpland_place(rs.getString("ARRPLAND_PLACE"));
+				vo.setTrain_name(rs.getString("TRAIN_NAME"));
+				vo.setCar_number(rs.getString("CAR_NUMBER"));
+				vo.setSeat(rs.getString("SEAT"));
+				vo.setDeppland_time(getDateToString(rs.getString("DEPPLAND_TIME")));
+				vo.setArrpland_time(getDateToString(rs.getString("ARRPLAND_TIME")));
+				vo.setPrice(rs.getString("PRICE"));
+				vo.setTicketing_day(getDateToString(rs.getString("TICKETING_DAY")));
+				vo.setTicket_type(rs.getString("TICKET_TYPE"));
+				vo.setTerm(rs.getString("TERM"));
+				vo.setEffective_date(getDateToString(rs.getString("EFFECTIVE_DATE")));
+				vo.setExpiration_date(getDateToString(rs.getString("EXPIRATION_DATE")));
+				
+				list.add(vo);
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return list;
+	}
+	
+	public boolean insertUserData(UserVo vo)
+	{
+		String id = vo.getId();
+		String pw = vo.getPw();
+		String name = vo.getName().length() == 0 ? "null" : "'" + vo.getName() + "'";
+		String contact = vo.getContact().length() == 0 ? "null" : "'" + vo.getContact() + "'";;
+		String register = vo.getRegister();
+		
+		try {
+			String sql = "insert into userdata values ('" + id + "', '" + pw + 
+					"', " + name + ", " + contact +	", to_date('" + register + "', 'yyyyMMddHH24MIss'))";
 			System.out.println(sql);
 			rs = stmt.executeQuery(sql);
 		}
@@ -44,6 +101,38 @@ public class TrainDAO
 			return false;
 		}
 		
+		return true;
+	}
+	
+	public boolean insertReservationData(String userId, String ticketId) {
+		try {
+			String sql = "insert into reservation values ('" + userId + "', " + ticketId + ")";
+			System.out.println(sql);
+			rs = stmt.executeQuery(sql);
+		}
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public boolean insertTicketData(TicketVo vo) {
+		try {
+			String sql = "insert into ticket values (" + vo.getTicket_id() + ", " + vo.getDeppland_place() + ", " 
+					+ vo.getArrpland_place() + ", " + vo.getTrain_name() + ", " + vo.getCar_number() + ", " + vo.getSeat() 
+					+ ", " + vo.getDeppland_time() + ", " + vo.getArrpland_time() + ", " + vo.getPrice() + ", "
+					+ vo.getTicketing_day() + ", " + vo.getTicket_type() + ", " + vo.getTerm() + ", " + vo.getEffective_date()
+					+ ", " + vo.getExpiration_date() + ")";
+			System.out.println(sql);
+			rs = stmt.executeQuery(sql);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 		return true;
 	}
 	
@@ -73,6 +162,23 @@ public class TrainDAO
 		return userVo;
 	}
 	
+	public int getLastId() {
+		int result = -1;
+		try {
+			String sql = "select MAX(ticket_id) from ticket";
+			rs = stmt.executeQuery(sql);
+			
+			if(rs.next())
+				result = Integer.parseInt(rs.getString("MAX(TICKET_ID)"));
+			
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			result = -1;
+		}
+		return result;
+	}
+	
 	public void connDB() {
 		try {
 			Class.forName(driver);
@@ -85,5 +191,28 @@ public class TrainDAO
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	protected void finalize() throws Throwable {
+		System.out.println("TrainDAO destroyed");
+	}
+	
+	private String getDateToString(String sDate) {
+		if(sDate == null) return null;
+		StringBuilder sb = new StringBuilder();
+		SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		
+		Calendar cal = Calendar.getInstance();
+		try {
+			cal.setTime(sf.parse(sDate));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
+		sb.append(cal.get(Calendar.YEAR)).append(cal.get(Calendar.MONTH) + 1)
+			.append(cal.get(Calendar.DAY_OF_MONTH)).append(cal.get(Calendar.HOUR))
+			.append(cal.get(Calendar.MINUTE));
+		
+		return sb.toString();
 	}
 }

@@ -10,16 +10,20 @@ public class TrainVo
 	private String trainNo;
 	private String depplandTime;
 	private String arrplandTime;
+	private String depPlace;
+	private String arrPlace;
 	
 	public TrainVo() {}
-	public TrainVo(String trainName, String trainNo, String depplandTime, String arrplandTime) {
+	public TrainVo(String trainName, String trainNo, String depplandTime, String arrplandTime, String depPlace, String arrPlace) {
 		this.trainName = trainName;
 		this.trainNo = trainNo;
 		this.depplandTime = depplandTime;
 		this.arrplandTime = arrplandTime;
+		this.depPlace = depPlace;
+		this.arrPlace = arrPlace;
 	}
 	
-	public String getName() { return trainName; }
+	public String getTrainName() { return trainName; }
 	public void setName(String name) { this.trainName = name; }
 	
 	public String getTrainNo() { return trainNo; }
@@ -54,4 +58,9 @@ public class TrainVo
 		
 		return sb.toString();
 	}
+	public String getDepPlace() { return depPlace; }
+	public void setDepPlace(String depPlace) { this.depPlace = depPlace; }
+	
+	public String getArrPlace() { return arrPlace; }
+	public void setArrPlace(String arrPlace) { this.arrPlace = arrPlace; }
 }

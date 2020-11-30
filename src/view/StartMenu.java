@@ -1,23 +1,20 @@
 package view;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
 import javax.swing.JButton;
-import javax.swing.JDialog;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -33,6 +30,8 @@ import javax.swing.JPasswordField;
 @SuppressWarnings("serial")
 public class StartMenu extends JFrame {
 
+	private ArrayList<JComponent> signUpComponents;
+	
 	private JPanel contentPane;
 	private JTextField idTextField_in;
 	private JTextField idTextField_up;
@@ -46,17 +45,20 @@ public class StartMenu extends JFrame {
 
 	public StartMenu() {
 		setTitle("기차 예매 프로그램");
-		dao = new TrainDAO();
+		dao = TrainDAO.getInstance();
 		// setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 800, 500);
 		contentPane = new JPanel();
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		setResizable(false);
+		signUpComponents = new ArrayList<JComponent>();
+		
 
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				System.out.println("Start Menu Closing..");
+				System.exit(0);
 			}
 
 			public void windowClosed(WindowEvent e) {
@@ -100,6 +102,7 @@ public class StartMenu extends JFrame {
 		gbc_idTextField_up.gridx = 1;
 		gbc_idTextField_up.gridy = 0;
 		inputPanel_1.add(idTextField_up, gbc_idTextField_up);
+		signUpComponents.add(idTextField_up);
 
 		JLabel pwLabel_1 = new JLabel("비밀번호");
 		GridBagConstraints gbc_pwLabel_1 = new GridBagConstraints();
@@ -115,6 +118,7 @@ public class StartMenu extends JFrame {
 		gbc_passwordField_up.gridx = 1;
 		gbc_passwordField_up.gridy = 1;
 		inputPanel_1.add(passwordField_up, gbc_passwordField_up);
+		signUpComponents.add(passwordField_up);
 
 		JLabel checkPwLabel = new JLabel("비밀번호 확인");
 		GridBagConstraints gbc_checkPwLabel = new GridBagConstraints();
@@ -130,7 +134,8 @@ public class StartMenu extends JFrame {
 		gbc_checkPasswordField_up.gridx = 1;
 		gbc_checkPasswordField_up.gridy = 2;
 		inputPanel_1.add(checkPasswordField_up, gbc_checkPasswordField_up);
-
+		signUpComponents.add(checkPasswordField_up);
+		
 		JLabel nameLabel = new JLabel("이름");
 		GridBagConstraints gbc_nameLabel = new GridBagConstraints();
 		gbc_nameLabel.insets = new Insets(0, 0, 5, 5);
@@ -146,7 +151,8 @@ public class StartMenu extends JFrame {
 		gbc_nameTextField_up.gridx = 1;
 		gbc_nameTextField_up.gridy = 3;
 		inputPanel_1.add(nameTextField_up, gbc_nameTextField_up);
-
+		signUpComponents.add(nameTextField_up);
+		
 		JLabel contactLabel = new JLabel("연락처");
 		GridBagConstraints gbc_contactLabel = new GridBagConstraints();
 		gbc_contactLabel.insets = new Insets(0, 0, 5, 5);
@@ -162,6 +168,7 @@ public class StartMenu extends JFrame {
 		gbc_contactTextField_up.gridx = 1;
 		gbc_contactTextField_up.gridy = 4;
 		inputPanel_1.add(contactTextField_up, gbc_contactTextField_up);
+		signUpComponents.add(contactTextField_up);
 
 		JButton confirmButton = new JButton("확인");
 		confirmButton.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
@@ -190,35 +197,7 @@ public class StartMenu extends JFrame {
 		contentPane.add(signInPanel);
 		signInPanel.setLayout(new BorderLayout(0, 0));
 
-		// 회원가입 등록 버튼
-		confirmButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String f_pw = String.valueOf(passwordField_up.getPassword());
-				String s_pw = String.valueOf(checkPasswordField_up.getPassword());
-				if (f_pw.equals(s_pw)) {
-					UserVo u = new UserVo(idTextField_up.getText(), String.valueOf(passwordField_up.getPassword()),
-							nameTextField_up.getText(), contactTextField_up.getText(), getTodayDate());
-
-					if (isConfirmSign(u)) {
-						signUpPanel.setVisible(false);
-						signInPanel.setVisible(true);
-						showDialog("회원가입이 완료되었습니다.");
-					} else {
-						showDialog("이미 존재하는 ID입니다.");
-					}
-				} else
-					showDialog("비밀 번호가 일치하지 않습니다.");
-			}
-		});
-
-		// 회원가입 취소 버튼
-		cancelButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				signUpPanel.setVisible(false);
-				signInPanel.setVisible(true);
-				showDialog("회원가입을 취소하셨습니다.");
-			}
-		});
+		
 
 		JPanel gridPanel = new JPanel();
 		gridPanel.setBorder(null);
@@ -280,6 +259,45 @@ public class StartMenu extends JFrame {
 		JButton signUpButton = new JButton("회원 가입");
 		signUpButton.setFont(new Font("맑은 고딕", Font.PLAIN, 22));
 		signInPanel.add(signUpButton, BorderLayout.SOUTH);
+		
+		// 회원가입 등록 버튼
+				confirmButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						
+						String f_pw = String.valueOf(passwordField_up.getPassword());
+						String s_pw = String.valueOf(checkPasswordField_up.getPassword());
+						
+						if(f_pw.length() == 0 || idTextField_up.getText().length() == 0)
+						{
+							showDialog("<html>ID 혹은 Password를<br><center>입력하지 않았습니다.</center></html>");
+							return;
+						}
+						
+						if (f_pw.equals(s_pw)) {
+							UserVo u = new UserVo(idTextField_up.getText(), String.valueOf(passwordField_up.getPassword()),
+									nameTextField_up.getText(), contactTextField_up.getText(), getTodayDate());
+
+							if (isConfirmSign(u)) {
+								signUpPanel.setVisible(false);
+								signInPanel.setVisible(true);
+								showDialog("회원가입이 완료되었습니다.");
+							} else {
+								showDialog("이미 존재하는 ID입니다.");
+							}
+						} else
+							showDialog("비밀 번호가 일치하지 않습니다.");
+					}
+				});
+
+				// 회원가입 취소 버튼
+				cancelButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						signUpPanel.setVisible(false);
+						signInPanel.setVisible(true);
+						showDialog("회원가입을 취소하셨습니다.");
+					}
+				});
+		
 		// 회원가입 버튼
 		signUpButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -298,55 +316,44 @@ public class StartMenu extends JFrame {
 					new MainMenu(userVo).setVisible(true);
 					dispose();
 				} else {
-					showDialog("ID / PW 가 틀렸습니다");
+					//showDialog("ID / PW 가 틀렸습니다");
+					
+					
 				}
 			}
 		});
 		setLocation(ScreenUtil.getCenterPosition(this));
 	}
 
-	protected void finalize() throws Throwable {
-		System.out.println("StartMenu destroyed");
+	@SuppressWarnings("unused")
+	void showDialog(String msg) {
+		NoticeDialog nd = new NoticeDialog(msg, this);
+		clearTextField();
 	}
-
-	void showDialog(String info) {
-		JDialog jd = new JDialog(this, "알림", true);
-		jd.setSize(240, 110);
-		jd.setLocation(getCurrentCenter(jd));
-		jd.getContentPane().setLayout(new FlowLayout());
-
-		JLabel msg = new JLabel(info, JLabel.CENTER);
-		JButton ok = new JButton("확인");
-
-		ok.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				jd.setVisible(false);
-				jd.dispose();
+	
+	private void clearTextField() {
+		for(JComponent c : signUpComponents) {
+			if(c instanceof JTextField) {
+				((JTextField)c).setText("");
 			}
-		});
-
-		jd.getContentPane().add(msg);
-		jd.getContentPane().add(ok);
-
-		jd.setVisible(true);
+			else {
+				((JPasswordField)c).setText("");
+			}
+		}
 	}
-
+	
 	private Date getTodayDate() {
 
 		return new Date(Calendar.getInstance().getTimeInMillis());
 	}
 
 	private boolean isConfirmSign(UserVo u) {
-		return dao.inputUserData(u);
+		
+		return dao.insertUserData(u);
 	}
 
-	private Point getCurrentCenter(Window window) {
-		Dimension parentSize = this.getSize();
-		Dimension currentWindowSize = window.getSize();
-
-		int x = this.getLocation().x + (parentSize.width / 2) - (currentWindowSize.width / 2);
-		int y = this.getLocation().y + (parentSize.height / 2) - (currentWindowSize.height / 2);
-
-		return new Point(x, y);
+	protected void finalize() throws Throwable {
+		System.out.println("StartMenu destroyed");
 	}
+	
 }

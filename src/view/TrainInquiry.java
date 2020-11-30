@@ -1,6 +1,7 @@
 package view;
 
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -8,11 +9,15 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -22,6 +27,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+import constants.Constants;
+import database.TicketVo;
+import database.TrainDAO;
 import openAPI.TrainAPI;
 import openAPI.TrainVo;
 import util.ScreenUtil;
@@ -32,17 +40,23 @@ import java.awt.BorderLayout;
 @SuppressWarnings("serial")
 public class TrainInquiry extends JFrame implements ActionListener{
 
-	private static final Color SKY_BLUE = new Color(51,153,255);
-	private ArrayList<Integer> seats;
-	private int personnel;
+	private TrainDAO dao;
+	private TrainVo currentTrainVo;
 	
+	private static final Color SKY_BLUE = new Color(51,153,255);
+	private ArrayList<String> seats;
+	private int personnel;
 	private JFrame parent;
 	
 	private JPanel contentPane;
+	
 	private ArrayList<TrainVo> trainList;
 	private JPanel trainInfomationsPanel;
 	private JLayeredPane refLayeredPane;
 	private JPanel refTrainList;
+	private JLabel refDepStation;
+	private JLabel refArrStation;
+	private JLabel refPresentlyDate;
 	
 //	public static void main(String[] args) {
 //		new TrainInquiry().setVisible(true);
@@ -57,10 +71,10 @@ public class TrainInquiry extends JFrame implements ActionListener{
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		GridBagLayout gbl_contentPane = new GridBagLayout();
-		gbl_contentPane.columnWidths = new int[] {977, 0};
-		gbl_contentPane.rowHeights = new int[] {40, 0, 507, 81, 0};
-		gbl_contentPane.columnWeights = new double[]{1.0, Double.MIN_VALUE};
-		gbl_contentPane.rowWeights = new double[]{0.0, 0.0, 1.0, 1.0, Double.MIN_VALUE};
+		gbl_contentPane.columnWidths = new int[] {980, 0};
+		gbl_contentPane.rowHeights = new int[] {40, 0, 507, 0};
+		gbl_contentPane.columnWeights = new double[]{0.0, Double.MIN_VALUE};
+		gbl_contentPane.rowWeights = new double[]{0.0, 0.0, 1.0, Double.MIN_VALUE};
 		contentPane.setLayout(gbl_contentPane);
 		
 		TitledBorder titled = new TitledBorder(new LineBorder(Color.black, 1));
@@ -104,16 +118,17 @@ public class TrainInquiry extends JFrame implements ActionListener{
 		
 		JLabel depStationLabel = new JLabel("출발역");
 		stationPanel.add(depStationLabel);
+		refDepStation = depStationLabel;
 		
 		JLabel arrowLabel = new JLabel(" → ");
 		stationPanel.add(arrowLabel);
 		
 		JLabel arrStationLabel = new JLabel("도착역");
 		stationPanel.add(arrStationLabel);
+		refArrStation = arrStationLabel;
 		
 		JLayeredPane layeredPane = new JLayeredPane();
 		GridBagConstraints gbc_layeredPane = new GridBagConstraints();
-		gbc_layeredPane.insets = new Insets(0, 0, 5, 0);
 		gbc_layeredPane.fill = GridBagConstraints.BOTH;
 		gbc_layeredPane.gridx = 0;
 		gbc_layeredPane.gridy = 2;
@@ -122,7 +137,7 @@ public class TrainInquiry extends JFrame implements ActionListener{
 		gbl_layeredPane.columnWidths = new int[]{974, 0};
 		gbl_layeredPane.rowHeights = new int[]{499, 0};
 		gbl_layeredPane.columnWeights = new double[]{0.0, Double.MIN_VALUE};
-		gbl_layeredPane.rowWeights = new double[]{0.0, Double.MIN_VALUE};
+		gbl_layeredPane.rowWeights = new double[]{1.0, Double.MIN_VALUE};
 		layeredPane.setLayout(gbl_layeredPane);
 		
 		JPanel trainListPanel = new JPanel();
@@ -138,6 +153,7 @@ public class TrainInquiry extends JFrame implements ActionListener{
 		gbl_trainListPanel.columnWeights = new double[]{0.0, Double.MIN_VALUE};
 		gbl_trainListPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
 		trainListPanel.setLayout(gbl_trainListPanel);
+		trainListPanel.setBorder(titled);
 		
 		JPanel datePanel = new JPanel();
 		GridBagConstraints gbc_datePanel = new GridBagConstraints();
@@ -161,13 +177,14 @@ public class TrainInquiry extends JFrame implements ActionListener{
 		gbc_previousDayButton.gridy = 0;
 		datePanel.add(previousDayButton, gbc_previousDayButton);
 		
-		JLabel presentlyDayLabel = new JLabel("2020년 00월 00일");
-		GridBagConstraints gbc_presentlyDayLabel = new GridBagConstraints();
-		gbc_presentlyDayLabel.anchor = GridBagConstraints.WEST;
-		gbc_presentlyDayLabel.insets = new Insets(0, 0, 0, 5);
-		gbc_presentlyDayLabel.gridx = 2;
-		gbc_presentlyDayLabel.gridy = 0;
-		datePanel.add(presentlyDayLabel, gbc_presentlyDayLabel);
+		JLabel presentlyDateLabel = new JLabel("2020년 00월 00일");
+		GridBagConstraints gbc_presentlyDateLabel = new GridBagConstraints();
+		gbc_presentlyDateLabel.anchor = GridBagConstraints.WEST;
+		gbc_presentlyDateLabel.insets = new Insets(0, 0, 0, 5);
+		gbc_presentlyDateLabel.gridx = 2;
+		gbc_presentlyDateLabel.gridy = 0;
+		datePanel.add(presentlyDateLabel, gbc_presentlyDateLabel);
+		refPresentlyDate = presentlyDateLabel;
 		
 		JButton nextDayButton = new JButton("다음 날");
 		GridBagConstraints gbc_nextDayButton = new GridBagConstraints();
@@ -256,9 +273,9 @@ public class TrainInquiry extends JFrame implements ActionListener{
 		layeredPane.add(selectSeatPanel, gbc_selectSeatPanel);
 		GridBagLayout gbl_selectSeatPanel = new GridBagLayout();
 		gbl_selectSeatPanel.columnWidths = new int[]{973, 0};
-		gbl_selectSeatPanel.rowHeights = new int[]{113, 250, 0};
+		gbl_selectSeatPanel.rowHeights = new int[]{113, 409, 0, 0};
 		gbl_selectSeatPanel.columnWeights = new double[]{0.0, Double.MIN_VALUE};
-		gbl_selectSeatPanel.rowWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
+		gbl_selectSeatPanel.rowWeights = new double[]{0.0, 0.0, 1.0, Double.MIN_VALUE};
 		selectSeatPanel.setLayout(gbl_selectSeatPanel);
 		
 		JPanel chargeInfoPanel = new JPanel();
@@ -272,6 +289,7 @@ public class TrainInquiry extends JFrame implements ActionListener{
 		
 		JPanel seatInfoPanel = new JPanel();
 		GridBagConstraints gbc_seatInfoPanel = new GridBagConstraints();
+		gbc_seatInfoPanel.insets = new Insets(0, 0, 5, 0);
 		gbc_seatInfoPanel.fill = GridBagConstraints.BOTH;
 		gbc_seatInfoPanel.gridx = 0;
 		gbc_seatInfoPanel.gridy = 1;
@@ -313,8 +331,17 @@ public class TrainInquiry extends JFrame implements ActionListener{
 		seatSelectPanel.add(buttonPanel2, gbc_buttonPanel2);
 		buttonPanel2.setLayout(btn_gl[1]);
 		
-		JButton[] seatButtons = new JButton[40];
+		JButton reservationButton = new JButton("예 매");
+		reservationButton.setFont(new Font("맑은 고딕", Font.PLAIN, 30));
+		GridBagConstraints gbc_reservationButton = new GridBagConstraints();
+		gbc_reservationButton.fill = GridBagConstraints.BOTH;
+		gbc_reservationButton.gridx = 0;
+		gbc_reservationButton.gridy = 2;
+		selectSeatPanel.add(reservationButton, gbc_reservationButton);
+		reservationButton.addActionListener(this);
 		
+		//좌석 버튼
+		JButton[] seatButtons = new JButton[40];
 		int row = btn_gl[0].getRows() * 2;
 		int cnt = 0;
 		for(int i = 0; i < row; i++) {
@@ -375,14 +402,6 @@ public class TrainInquiry extends JFrame implements ActionListener{
 		
 		trainCategoryBox.addActionListener(this);
 		
-		JButton reservButton = new JButton("예 매");
-		reservButton.setFont(new Font("굴림", Font.BOLD, 20));
-		GridBagConstraints gbc_reservButton = new GridBagConstraints();
-		gbc_reservButton.fill = GridBagConstraints.BOTH;
-		gbc_reservButton.gridx = 0;
-		gbc_reservButton.gridy = 3;
-		contentPane.add(reservButton, gbc_reservButton);
-		
 		refLayeredPane = layeredPane;
 		refTrainList = trainListPanel;
 		setLocation(ScreenUtil.getCenterPosition(this));
@@ -391,41 +410,38 @@ public class TrainInquiry extends JFrame implements ActionListener{
 	public TrainInquiry(ArrayList<TrainVo> list, JFrame parent, int personnel) {
 		this();
 		trainList = list;
+		dao = TrainDAO.getInstance();
+		refPresentlyDate.setText(getDateString(trainList.get(0).getDepplandTime()));
+		refDepStation.setText(trainList.get(0).getDepPlace());
+		refArrStation.setText(trainList.get(0).getArrPlace());
 		this.parent = parent;
 		initScrollPane(list, "모두");
 		this.personnel = personnel;
-		seats = new ArrayList<Integer>(personnel);
+		seats = new ArrayList<String>(personnel);
 	}
 	
-	private void initScrollPane(ArrayList<TrainVo> list, String type) {
-		trainInfomationsPanel.removeAll();
-		System.out.println("모든 열차 정보 수 : " + trainList.size());
-		int cnt = 0;
-		for(TrainVo vo : list) {
-			if(type.equals(vo.getName()) || type.equals("모두")) {
-				TrainInfomation ti = new TrainInfomation(vo);
-				ti.addButtonEvent(this);
-				trainInfomationsPanel.add(ti);
-				cnt++;
-			}
-		}
-		trainInfomationsPanel.updateUI();
-
-		System.out.println(type + " 열차 정보 수 : " + cnt);
+	public void setLayer(int layer) {
+		refLayeredPane.setLayer(refTrainList, layer);
 	}
 
 	@SuppressWarnings("unchecked")
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() instanceof JButton) {
+			//System.out.println("Button " + e.getActionCommand());
 			if(e.getActionCommand().equals("예 매")) 
 			{
 				if(seats.size() < personnel) {
-					showDialog("<html>인원 수 보다 좌석의 수가 적습니다.<br><center>나머지 좌석은 무작위로 선택되거나, 입석으로 처리됩니다.</center></html>");
+					System.out.println("인원 좌석 안맞음");
+					showDialog("<html>인원 수 보다 좌석의 수가 적습니다.<br><center>나머지 좌석은 무작위로 선택됩니다.</center></html>", 0);
 				}
-			}
-			else if(e.getActionCommand().contains("원")) 
-			{
-				refLayeredPane.setLayer(refTrainList, 0);
+				else {
+					System.out.println("인원 좌석 맞음");
+					String seat = "";
+					for(String s : seats) {
+						seat += s + " ";
+					}
+					showDialog("<html>현재 선택된 좌석으로 진행 하시겠습니까?<br><center>" + seat + "</center></html>", 1);
+				}
 			}
 			else if(e.getActionCommand().contains("뒤로") && (refLayeredPane.getComponentCountInLayer(0) > 0))
 				refLayeredPane.setLayer(refTrainList, 2);
@@ -436,18 +452,21 @@ public class TrainInquiry extends JFrame implements ActionListener{
 			}
 			else
 			{
-				System.out.println(e.getActionCommand());
 				JButton btn = (JButton)e.getSource();
 				Color color = btn.getBackground();
-				int seat = Integer.parseInt(btn.getActionCommand());
-				if(color.equals(Color.RED) && seats.size() < personnel) {
-					btn.setBackground(SKY_BLUE);
+				String seat = btn.getActionCommand();
+				
+				if (color.equals(SKY_BLUE) && seats.size() < personnel) {
+					System.out.println(e.getActionCommand() + " SKY BLUE");
+					btn.setBackground(Color.RED);
 					seats.add(seat);
 				}
-				else if (color.equals(SKY_BLUE)) {
-					btn.setBackground(Color.RED);
+				else if(color.equals(Color.RED)) {
+					System.out.println(e.getActionCommand() + " RED");
+					btn.setBackground(SKY_BLUE);
 					seats.remove(seat);
 				}
+				System.out.println("seats size " + seats.size());
 			}	
 		}
 		else if(e.getSource() instanceof JComboBox)
@@ -461,7 +480,138 @@ public class TrainInquiry extends JFrame implements ActionListener{
 		}
 	}
 	
-	private void showDialog(String msg) {
+	private void initScrollPane(ArrayList<TrainVo> list, String type) {
+		trainInfomationsPanel.removeAll();
+		System.out.println("모든 열차 정보 수 : " + trainList.size());
+		int cnt = 0;
+		for(TrainVo vo : list) {
+			if(type.equals(vo.getTrainName()) || type.equals("모두")) {
+				TrainInformation ti = new TrainInformation(vo, this);
+				trainInfomationsPanel.add(ti);
+				cnt++;
+			}
+		}
+		trainInfomationsPanel.updateUI();
+
+		System.out.println(type + " 열차 정보 수 : " + cnt);
+	}
+	
+	private String getDateString(String str_date) {
+		SimpleDateFormat sf = new SimpleDateFormat("yyyyMMddHHmm");
+		Calendar cal = Calendar.getInstance();
+		StringBuilder sb = new StringBuilder();
+		try {
+			cal.setTime(sf.parse(str_date));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		sb.append(cal.get(Calendar.YEAR)).append("년 ").append(cal.get(Calendar.MONTH) + 1).append("월 ")
+			.append(cal.get(Calendar.DAY_OF_MONTH)).append("일");
 		
+		return sb.toString(); 
+	}
+	
+	private void showDialog(String msg, int type) {
+		JDialog jd = new JDialog(this, "알림", true);
+		jd.setSize(200, 120);
+		jd.setLocation(ScreenUtil.getCurrentCenter(this, jd));
+		jd.setResizable(false);
+		jd.getContentPane().setLayout(new FlowLayout());
+		
+		JLabel message = new JLabel(msg);
+		JButton confirm = new JButton("확인");
+		JButton cancel = new JButton("취소");
+		jd.getContentPane().add(message);
+		jd.getContentPane().add(confirm);
+		jd.getContentPane().add(cancel);
+		
+		cancel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				jd.dispose();
+			}
+		});
+		
+		confirm.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(type == 0)
+					setRandomSeat(personnel - seats.size());
+				reservationTrain();
+				jd.dispose();
+				subDialog("기차 예약이 완료되었습니다.");
+			}
+		});
+		
+		jd.setVisible(true);
+	}
+	
+	@SuppressWarnings("unused")
+	private void subDialog(String msg) {
+		NoticeDialog nd = new NoticeDialog(msg, this);
+	}
+	
+	private void setRandomSeat(int count) {
+		for(int i = 0; i < count; i++) {
+			String tmp = null;
+			while(true) {
+				boolean isOverlap = false;
+				tmp = String.format("%d", (int)(Math.random() * 40 + 1));
+				
+				for(int j = 0; j < seats.size(); j++) {
+					if(seats.get(j).equals(tmp)) {
+						isOverlap = true;
+						break;
+					}
+				}
+				
+				if(!isOverlap) break;
+			}
+			seats.add(tmp);
+		}
+	}
+	
+	private void reservationTrain() {
+		TicketVo ticket = new TicketVo();
+		((MainMenu)parent).addReservation(ticket.getTicket_id());
+		ticket.setDeppland_place(currentTrainVo.getDepPlace());
+		ticket.setArrpland_place(currentTrainVo.getArrPlace());
+		ticket.setTrain_name(currentTrainVo.getTrainName());
+		ticket.setCar_number(currentTrainVo.getTrainNo());
+		ticket.setSeat(getSeatString());
+		ticket.setDeppland_time(currentTrainVo.getDepplandTime());
+		ticket.setArrpland_time(currentTrainVo.getArrplandTime());
+		String tmpPrice = "1000";
+		ticket.setPrice(tmpPrice);
+		ticket.setTicketing_day(Constants.getTodayDate());
+		ticket.setTicket_type(Constants.ONE_WAY);
+		
+		dao.insertTicketData(ticket);
+		
+		parent.setVisible(true);
+		dispose();
+	}
+
+	private String getSeatString() {
+		StringBuilder sb = new StringBuilder();
+		
+		for(String s : seats) {
+			sb.append(s).append(" ");
+		}
+		
+		return sb.toString().trim();
+	}
+	
+	
+	public void setCurrentTrainVo(TrainVo currentTrainVo) {
+		this.currentTrainVo = currentTrainVo;
 	}
 }
+
+
+
+
+
+
+
+
+
+

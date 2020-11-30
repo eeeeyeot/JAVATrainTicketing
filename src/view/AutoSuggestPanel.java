@@ -16,12 +16,12 @@ import javax.swing.JTextField;
 import openAPI.TrainAPI;
 
 @SuppressWarnings("serial")
-public class AutoSuggest extends JPanel{
+public class AutoSuggestPanel extends JPanel{
 	private JTextField tf;
 	private JComboBox<String> combo;
 	private Vector<String> v;
 	
-	AutoSuggest(){
+	AutoSuggestPanel(){
 		v = TrainAPI.getInstance().getStationNames();
 		setLayout(new GridBagLayout());
 		

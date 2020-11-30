@@ -78,7 +78,7 @@ public class TrainAPI
 			list.add(md.getKey());
 		return list; 
 	}
-
+	
 	//get train list for ticketing
 	@SuppressWarnings("resource")
 	public ArrayList<TrainVo> getTrainList(String depPlaceName, String arrPlaceName, String depPlandTime) {

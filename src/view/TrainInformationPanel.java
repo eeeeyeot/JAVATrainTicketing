@@ -19,17 +19,17 @@ import javax.swing.border.TitledBorder;
 import openAPI.*;
 
 @SuppressWarnings("serial")
-public class TrainInformation extends JPanel implements ActionListener{
+public class TrainInformationPanel extends JPanel implements ActionListener{
 	private JLabel trainIdentityLabel;
 	private JLabel depplandTimeLabel;
 	private JLabel arrplandTimeLabel;
 	private JButton priceButton;
 	
-	private TrainInquiry parent;
+	private TrainInquiryMenu parent;
 	private TrainVo vo;
 
 	
-	public TrainInformation() {
+	public TrainInformationPanel() {
 		setForeground(Color.BLACK);
 		setBorder(null);
 		setLayout(new GridLayout(0, 4, 0, 0));
@@ -62,7 +62,7 @@ public class TrainInformation extends JPanel implements ActionListener{
 		priceButton.addActionListener(this);
 	}
 	
-	public TrainInformation(TrainVo vo, TrainInquiry parent) {
+	public TrainInformationPanel(TrainVo vo, TrainInquiryMenu parent) {
 		this();
 		this.parent = parent;
 		this.vo = vo;
@@ -86,7 +86,10 @@ public class TrainInformation extends JPanel implements ActionListener{
 		//선택된 TrainVo를 가져와야함
 		parent.setLayer(0);
 		parent.setCurrentTrainVo(vo);
+		parent.initSeatButton(vo);
 	}
+	
+	
 }
 
 

@@ -39,9 +39,9 @@ public class UserVo {
 		StringBuffer	sb	= new StringBuffer();
 		Calendar		cal	= Calendar.getInstance();
 		cal.setTime(date);
-		sb.append(cal.get(Calendar.YEAR)).append(cal.get(Calendar.MONTH) + 1)
-			.append(cal.get(Calendar.DAY_OF_MONTH)).append(cal.get(Calendar.HOUR_OF_DAY))
-			.append(cal.get(Calendar.MINUTE)).append(cal.get(Calendar.SECOND));
+		sb.append(cal.get(Calendar.YEAR)).append(String.format("%02d", cal.get(Calendar.MONTH) + 1))
+			.append(String.format("%02d", cal.get(Calendar.DAY_OF_MONTH))).append(String.format("%02d", cal.get(Calendar.HOUR_OF_DAY)))
+			.append(String.format("%02d", cal.get(Calendar.MINUTE))).append(String.format("%02d", cal.get(Calendar.SECOND)));
 
 		return sb.toString();
 	}

@@ -9,6 +9,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 //import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.text.ParseException;
@@ -29,6 +30,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import database.TicketVo;
 import database.TrainDAO;
 import database.UserVo;
 import openAPI.TrainAPI;
@@ -39,11 +41,17 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ActionEvent;
 import java.awt.FlowLayout;
+import javax.swing.JScrollPane;
 
 @SuppressWarnings("serial")
 public class MainMenu extends JFrame {
-
+	
+	private TrainDAO dao;
 	private UserVo userVo;
+	private Window parent;
+	private JPanel ticketListPanel;
+	private JLabel welcomeLabel;
+	
 	private JPanel contentPane;
 	
 	public MainMenu() {
@@ -55,21 +63,14 @@ public class MainMenu extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setResizable(false);
-
-		this.addComponentListener(new ComponentAdapter() {
-			public void componentShown(ComponentEvent e)
-			{
-				UpdateTicket();
-			}
-		});
 		
 		JPanel northPanel = new JPanel();
 		contentPane.add(northPanel, BorderLayout.NORTH);
 		GridBagLayout gbl_northPanel = new GridBagLayout();
-		gbl_northPanel.columnWidths = new int[] { 266, 476, 0 };
-		gbl_northPanel.rowHeights = new int[] { 121, 0 };
-		gbl_northPanel.columnWeights = new double[] { 0.0, 0.0, Double.MIN_VALUE };
-		gbl_northPanel.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
+		gbl_northPanel.columnWidths = new int[] { 174, 476, 0 };
+		gbl_northPanel.rowHeights = new int[] { 121, 0, 0 };
+		gbl_northPanel.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
+		gbl_northPanel.rowWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
 		northPanel.setLayout(gbl_northPanel);
 
 		/*
@@ -85,12 +86,34 @@ public class MainMenu extends JFrame {
 		gbc_imagePanel.insets = new Insets(0, 0, 0, 5);
 		gbc_imagePanel.gridx = 0;
 		gbc_imagePanel.gridy = 0;
+		
+		JPanel logoutPanel = new JPanel();
+		GridBagConstraints gbc_logoutPanel = new GridBagConstraints();
+		gbc_logoutPanel.insets = new Insets(0, 0, 5, 5);
+		gbc_logoutPanel.gridx = 0;
+		gbc_logoutPanel.gridy = 0;
+		northPanel.add(logoutPanel, gbc_logoutPanel);
+		logoutPanel.setLayout(new GridLayout(0, 1, 0, 0));
+		
+		welcomeLabel = new JLabel();
+		welcomeLabel.setText("안녕하세요.OOO님");
+		welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		welcomeLabel.setFont(new Font("나눔스퀘어", Font.PLAIN, 16));
+		logoutPanel.add(welcomeLabel);
+		
+		JPanel panel = new JPanel();
+		logoutPanel.add(panel);
+		
+		JButton logoutButton = new JButton("로그아웃");
+		logoutButton.setFont(new Font("나눔스퀘어", Font.PLAIN, 12));
+		panel.add(logoutButton);
 		//northPanel.add(imagePanel, gbc_imagePanel);
 
 		JLabel korailLabel = new JLabel("Korail");
 		korailLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 40));
 		korailLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		GridBagConstraints gbc_korailLabel = new GridBagConstraints();
+		gbc_korailLabel.insets = new Insets(0, 0, 5, 0);
 		gbc_korailLabel.fill = GridBagConstraints.BOTH;
 		gbc_korailLabel.gridx = 1;
 		gbc_korailLabel.gridy = 0;
@@ -109,7 +132,7 @@ public class MainMenu extends JFrame {
 		JLabel reservTicketLabel = new JLabel("<html>승차권 예매</html>");
 		reservTicketLabel.setFont(new Font("맑은 고딕", Font.BOLD, 25));
 		ticketingTabbedPane.add(reservTicketPanel);
-		ticketingTabbedPane.setTitleAt(0, "승차권                예매");
+		ticketingTabbedPane.setTitleAt(0, "승차권                  예매");
 		ticketingTabbedPane.setTabComponentAt(0, reservTicketLabel);
 		reservTicketPanel.setLayout(new BorderLayout(0, 0));
 
@@ -126,7 +149,7 @@ public class MainMenu extends JFrame {
 		gbl_onewayPanel.columnWidths = new int[] { 823, 0 };
 		gbl_onewayPanel.rowHeights = new int[] { 90, 90, 90, 90, 0, 0 };
 		gbl_onewayPanel.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-		gbl_onewayPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
+		gbl_onewayPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		onewayPanel.setLayout(gbl_onewayPanel);
 
 		JPanel selectStationPanel = new JPanel();
@@ -147,7 +170,7 @@ public class MainMenu extends JFrame {
 		depPlaceLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		departurePanel.add(depPlaceLabel);
 
-		AutoSuggest depComboBox = new AutoSuggest();
+		AutoSuggestPanel depComboBox = new AutoSuggestPanel();
 		departurePanel.add(depComboBox);
 		GridBagLayout gbl_depComboBox = new GridBagLayout();
 		gbl_depComboBox.columnWidths = new int[] { 0 };
@@ -164,7 +187,7 @@ public class MainMenu extends JFrame {
 		arrPlaceLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		arrPlaceLabel.setFont(new Font("굴림", Font.PLAIN, 20));
 		arrivePanel.add(arrPlaceLabel);
-		AutoSuggest arrComboBox = new AutoSuggest();
+		AutoSuggestPanel arrComboBox = new AutoSuggestPanel();
 		arrivePanel.add(arrComboBox);
 		GridBagLayout gbl_arrComboBox = new GridBagLayout();
 		gbl_arrComboBox.columnWidths = new int[] { 0 };
@@ -454,16 +477,16 @@ public class MainMenu extends JFrame {
 		selectChildLabel.setFont(new Font("굴림", Font.PLAIN, 20));
 		selectChildCountPanel.add(selectChildLabel);
 
-		JPanel panel = new JPanel();
-		selectChildCountPanel.add(panel);
+		JPanel selectChildCount = new JPanel();
+		selectChildCountPanel.add(selectChildCount);
 
 		JButton decreaseChildCntButton = new JButton("-");
-		panel.add(decreaseChildCntButton);
+		selectChildCount.add(decreaseChildCntButton);
 
 		JTextField childCntTextField = new JTextField("0");
 		childCntTextField.setHorizontalAlignment(SwingConstants.CENTER);
 		childCntTextField.setColumns(10);
-		panel.add(childCntTextField);
+		selectChildCount.add(childCntTextField);
 
 		decreaseChildCntButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -494,7 +517,7 @@ public class MainMenu extends JFrame {
 		});
 
 		JButton increaseChildCntButton = new JButton("+");
-		panel.add(increaseChildCntButton);
+		selectChildCount.add(increaseChildCntButton);
 		increaseChildCntButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				increaseCount(childCntTextField);
@@ -510,16 +533,16 @@ public class MainMenu extends JFrame {
 		selectAdultLabel.setFont(new Font("굴림", Font.PLAIN, 20));
 		selectAdultCountPanel.add(selectAdultLabel);
 
-		JPanel panel_1 = new JPanel();
-		selectAdultCountPanel.add(panel_1);
+		JPanel selectAdultCount = new JPanel();
+		selectAdultCountPanel.add(selectAdultCount);
 
 		JButton decreaseAdultCntButton = new JButton("-");
-		panel_1.add(decreaseAdultCntButton);
+		selectAdultCount.add(decreaseAdultCntButton);
 
 		JTextField adultCntTextField = new JTextField("0");
 		adultCntTextField.setHorizontalAlignment(SwingConstants.CENTER);
 		adultCntTextField.setColumns(10);
-		panel_1.add(adultCntTextField);
+		selectAdultCount.add(adultCntTextField);
 
 		adultCntTextField.getDocument().addDocumentListener(new DocumentListener() {
 			public void insertUpdate(DocumentEvent e) {
@@ -546,7 +569,7 @@ public class MainMenu extends JFrame {
 		});
 
 		JButton increaseAdultCntButton = new JButton("+");
-		panel_1.add(increaseAdultCntButton);
+		selectAdultCount.add(increaseAdultCntButton);
 		increaseAdultCntButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				increaseCount(adultCntTextField);
@@ -562,16 +585,16 @@ public class MainMenu extends JFrame {
 		selectSeniorLabel.setFont(new Font("굴림", Font.PLAIN, 20));
 		selectSeniorCountPanel.add(selectSeniorLabel);
 
-		JPanel panel_2 = new JPanel();
-		selectSeniorCountPanel.add(panel_2);
+		JPanel selectSeniorCount = new JPanel();
+		selectSeniorCountPanel.add(selectSeniorCount);
 
 		JButton decreaseSeniorCntButton = new JButton("-");
-		panel_2.add(decreaseSeniorCntButton);
+		selectSeniorCount.add(decreaseSeniorCntButton);
 
 		JTextField seniorCntTextField = new JTextField("0");
 		seniorCntTextField.setHorizontalAlignment(SwingConstants.CENTER);
 		seniorCntTextField.setColumns(10);
-		panel_2.add(seniorCntTextField);
+		selectSeniorCount.add(seniorCntTextField);
 
 		decreaseSeniorCntButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -597,7 +620,7 @@ public class MainMenu extends JFrame {
 		});
 
 		JButton increaseSeniorCntButton = new JButton("+");
-		panel_2.add(increaseSeniorCntButton);
+		selectSeniorCount.add(increaseSeniorCntButton);
 
 		increaseSeniorCntButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -622,7 +645,7 @@ public class MainMenu extends JFrame {
 					String arrText = arrComboBox.getComboBoxText();
 					String date = yearTextField.getText() + monthTextField.getText() + dayTextField.getText();
 					ArrayList<TrainVo> list = TrainAPI.getInstance().getTrainList(depText, arrText, date);
-					new TrainInquiry(list, thisObj, personnel).setVisible(true);
+					new TrainInquiryMenu(list, thisObj, personnel).setVisible(true);
 					setVisible(false);
 				}else
 				{
@@ -631,7 +654,7 @@ public class MainMenu extends JFrame {
 				}
 			}
 		});
-		reservationButton.setFont(new Font("맑은 고딕", Font.PLAIN, 20));
+		reservationButton.setFont(new Font("맑은 고딕", Font.PLAIN, 24));
 		reservTicketPanel.add(reservationButton, BorderLayout.SOUTH);
 		reservTicketTabbedPane.setTabComponentAt(1, roundTripLabel);
 		// #####################################################
@@ -642,27 +665,83 @@ public class MainMenu extends JFrame {
 		seasonTicketLabel.setFont(new Font("맑은 고딕", Font.BOLD, 25));
 		ticketingTabbedPane.add(seasonTicketPanel);
 		ticketingTabbedPane.setTabComponentAt(1, seasonTicketLabel);
-		// #####################################################
-
-		// #####################################################
-		JPanel ticketConfirmPanel = new JPanel();
+		
+		JPanel ticketConfrimPanel = new JPanel();
 		JLabel ticketConfirmLabel = new JLabel("<html>승차권  확인</html>");
 		ticketConfirmLabel.setFont(new Font("맑은 고딕", Font.BOLD, 25));
-		ticketingTabbedPane.add(ticketConfirmPanel);
+		ticketingTabbedPane.add(ticketConfrimPanel);
 		ticketingTabbedPane.setTabComponentAt(2, ticketConfirmLabel);
+		GridBagLayout gbl_ticketConfrimPanel = new GridBagLayout();
+		gbl_ticketConfrimPanel.columnWidths = new int[]{802, 0};
+		gbl_ticketConfrimPanel.rowHeights = new int[]{2, 0};
+		gbl_ticketConfrimPanel.columnWeights = new double[]{1.0, Double.MIN_VALUE};
+		gbl_ticketConfrimPanel.rowWeights = new double[]{1.0, Double.MIN_VALUE};
+		ticketConfrimPanel.setLayout(gbl_ticketConfrimPanel);
+		
+		ticketListPanel = new JPanel();
+		JScrollPane ticketConfirmScrollPane = new JScrollPane(ticketListPanel);
+		GridBagLayout gbl_ticketListPanel = new GridBagLayout();
+		gbl_ticketListPanel.columnWidths = new int[]{805, 0};
+		gbl_ticketListPanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
+		gbl_ticketListPanel.columnWeights = new double[]{1.0, Double.MIN_VALUE};
+		gbl_ticketListPanel.rowWeights = new double[]{1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, Double.MIN_VALUE};
+		ticketListPanel.setLayout(gbl_ticketListPanel);
+		ticketConfirmScrollPane.getVerticalScrollBar().setUnitIncrement(16);
+		
+		GridBagConstraints gbc_ticketConfirmScrollPane = new GridBagConstraints();
+		gbc_ticketConfirmScrollPane.fill = GridBagConstraints.BOTH;
+		gbc_ticketConfirmScrollPane.gridx = 0;
+		gbc_ticketConfirmScrollPane.gridy = 0;
+		ticketConfrimPanel.add(ticketConfirmScrollPane, gbc_ticketConfirmScrollPane);
 		// #####################################################
+		
+		logoutButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				parent.setVisible(true);
+				dispose();
+			}
+		});
+		
 		setLocation(ScreenUtil.getCenterPosition(this));
 	}
 
-	public MainMenu(UserVo userVo) {
+	public MainMenu(UserVo userVo, Window parent) {
 		this();
 		this.userVo = userVo;
+		dao = TrainDAO.getInstance();
+		setWelcoming();
+		this.parent = parent;
+		
+		addComponentListener(new ComponentAdapter() {
+			public void componentShown(ComponentEvent e)
+			{
+				UpdateTicketList();
+			}
+		});
 	}
 	
 	public void addReservation(String ticketId) {
 		//add reservation information into DB
-		TrainDAO dao = TrainDAO.getInstance();
 		dao.insertReservationData(userVo.getId(), ticketId);
+	}
+
+	private void UpdateTicketList() {
+		ticketListPanel.removeAll();
+		ArrayList<TicketVo> tickets = dao.getTicketList(userVo.getId());
+		if(tickets != null) {
+			for(int i = 0; i < tickets.size(); i++) {
+				GridBagConstraints gbc_panel = new GridBagConstraints();
+				gbc_panel.insets = new Insets(0, 0, 5, 0);
+				gbc_panel.fill = GridBagConstraints.BOTH;
+				gbc_panel.gridx = 0;
+				gbc_panel.gridy = i;
+				ticketListPanel.add(new TicketInformationPanel(tickets.get(i)), gbc_panel);
+			}
+		}
+	}
+	
+	private void setWelcoming() {
+		welcomeLabel.setText("<html>안녕하세요.<br><center>" + userVo.getName() + "님</center></html>");
 	}
 	
 	private void numberFormatLimit(KeyEvent e, int limit) {
@@ -717,7 +796,6 @@ public class MainMenu extends JFrame {
 		int textInt = Integer.parseInt(tf.getText());
 		// dayTextField일 경우
 		if (isDay) {
-			System.out.println(month);
 			int maxDay = getMaximumDay(year, month);
 			if (textInt > maxDay)
 				tf.setText(String.format("%d", maxDay));
@@ -785,13 +863,5 @@ public class MainMenu extends JFrame {
 	private void showDialog(String msg) {
 		@SuppressWarnings("unused")
 		NoticeDialog nd = new NoticeDialog(msg, this);
-	}
-	
-	private void UpdateTicket() 
-	{
-		@SuppressWarnings("unused")
-		TrainDAO dao = TrainDAO.getInstance();
-		
-		//TicketInformation 승차권확인 탭에 추가
 	}
 }

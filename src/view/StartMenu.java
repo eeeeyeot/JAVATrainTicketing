@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -57,12 +58,7 @@ public class StartMenu extends JFrame {
 
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				System.out.println("Start Menu Closing..");
 				System.exit(0);
-			}
-
-			public void windowClosed(WindowEvent e) {
-				System.out.println("Start Menu Closed");
 			}
 		});
 
@@ -259,45 +255,44 @@ public class StartMenu extends JFrame {
 		JButton signUpButton = new JButton("회원 가입");
 		signUpButton.setFont(new Font("맑은 고딕", Font.PLAIN, 22));
 		signInPanel.add(signUpButton, BorderLayout.SOUTH);
-		
+
 		// 회원가입 등록 버튼
-				confirmButton.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						
-						String f_pw = String.valueOf(passwordField_up.getPassword());
-						String s_pw = String.valueOf(checkPasswordField_up.getPassword());
-						
-						if(f_pw.length() == 0 || idTextField_up.getText().length() == 0)
-						{
-							showDialog("<html>ID 혹은 Password를<br><center>입력하지 않았습니다.</center></html>");
-							return;
-						}
-						
-						if (f_pw.equals(s_pw)) {
-							UserVo u = new UserVo(idTextField_up.getText(), String.valueOf(passwordField_up.getPassword()),
-									nameTextField_up.getText(), contactTextField_up.getText(), getTodayDate());
+		confirmButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 
-							if (isConfirmSign(u)) {
-								signUpPanel.setVisible(false);
-								signInPanel.setVisible(true);
-								showDialog("회원가입이 완료되었습니다.");
-							} else {
-								showDialog("이미 존재하는 ID입니다.");
-							}
-						} else
-							showDialog("비밀 번호가 일치하지 않습니다.");
-					}
-				});
+				String f_pw = String.valueOf(passwordField_up.getPassword());
+				String s_pw = String.valueOf(checkPasswordField_up.getPassword());
 
-				// 회원가입 취소 버튼
-				cancelButton.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
+				if (f_pw.length() == 0 || idTextField_up.getText().length() == 0) {
+					showDialog("<html>ID 혹은 Password를<br><center>입력하지 않았습니다.</center></html>");
+					return;
+				}
+
+				if (f_pw.equals(s_pw)) {
+					UserVo u = new UserVo(idTextField_up.getText(), String.valueOf(passwordField_up.getPassword()),
+							nameTextField_up.getText(), contactTextField_up.getText(), getTodayDate());
+
+					if (isConfirmSign(u)) {
 						signUpPanel.setVisible(false);
 						signInPanel.setVisible(true);
-						showDialog("회원가입을 취소하셨습니다.");
+						showDialog("회원가입이 완료되었습니다.");
+					} else {
+						showDialog("이미 존재하는 ID입니다.");
 					}
-				});
-		
+				} else
+					showDialog("비밀 번호가 일치하지 않습니다.");
+			}
+		});
+
+		// 회원가입 취소 버튼
+		cancelButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				signUpPanel.setVisible(false);
+				signInPanel.setVisible(true);
+				showDialog("회원가입을 취소하셨습니다.");
+			}
+		});
+
 		// 회원가입 버튼
 		signUpButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -308,16 +303,17 @@ public class StartMenu extends JFrame {
 
 		});
 
+		Window thisWindow = this;
 		// 로그인 버튼
 		signinButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				UserVo userVo;
 				if ((userVo = dao.checkLoginData(idTextField_in.getText(), String.valueOf(passwordField_in.getPassword()))) != null) {
-					new MainMenu(userVo).setVisible(true);
-					dispose();
+					new MainMenu(userVo, thisWindow).setVisible(true);
+					//dispose();
+					setVisible(false);
 				} else {
-					//showDialog("ID / PW 가 틀렸습니다");
-					
+					showDialog("ID / PW 가 틀렸습니다");
 					
 				}
 			}
@@ -343,7 +339,7 @@ public class StartMenu extends JFrame {
 	}
 	
 	private Date getTodayDate() {
-
+		
 		return new Date(Calendar.getInstance().getTimeInMillis());
 	}
 

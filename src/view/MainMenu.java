@@ -1,6 +1,7 @@
 package view;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 //import java.awt.Graphics;
@@ -16,6 +17,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 
 //import javax.swing.ImageIcon;
@@ -30,6 +32,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import constants.Constants;
 import database.TicketVo;
 import database.TrainDAO;
 import database.UserVo;
@@ -51,6 +54,8 @@ public class MainMenu extends JFrame {
 	private Window parent;
 	private JPanel ticketListPanel;
 	private JLabel welcomeLabel;
+	
+	private int personnel = 0;
 	
 	private JPanel contentPane;
 	
@@ -141,6 +146,7 @@ public class MainMenu extends JFrame {
 
 		JPanel onewayPanel = new JPanel();
 		JLabel onewayLabel = new JLabel("편도");
+		onewayLabel.setFont(new Font("맑은 고딕", Font.BOLD, 20));
 		onewayLabel.setPreferredSize(new Dimension(380, 30));
 		reservTicketTabbedPane.add(onewayPanel);
 		// reservTicketTabbedPane.setTitleAt(0, "편도");
@@ -630,20 +636,24 @@ public class MainMenu extends JFrame {
 		
 		JPanel roundTripPanel = new JPanel();
 		JLabel roundTripLabel = new JLabel("왕복");
+		roundTripLabel.setFont(new Font("맑은 고딕", Font.BOLD, 20));
 		roundTripLabel.setPreferredSize(new Dimension(380, 30));
 		reservTicketTabbedPane.add(roundTripPanel);
-		// reservTicketTabbedPane.setTitleAt(1, "왕복");
+		reservTicketTabbedPane.setTabComponentAt(1, roundTripLabel);
 
 		JFrame thisObj = this;
-		
-		JButton reservationButton = new JButton("열차 조회");
-		reservationButton.addActionListener(new ActionListener() {
+		JButton trainInquiryButton = new JButton("열차 조회");
+		trainInquiryButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int personnel = Integer.parseInt(childCntTextField.getText()) + Integer.parseInt(adultCntTextField.getText()) + Integer.parseInt(seniorCntTextField.getText());
-				if(personnel > 0) { 
+				String selectedDate = yearTextField.getText() + monthTextField.getText() + dayTextField.getText();
+				
+				if(selectedDate.compareTo(Constants.getTodayDateToString()) < 0) {
+					showDialog("<html><center>선택한 날짜가</center><center>유효하지 않습니다.</center></html>");
+				}
+				else if(personnel > 0) { 
 					String depText = depComboBox.getComboBoxText();
 					String arrText = arrComboBox.getComboBoxText();
-					String date = yearTextField.getText() + monthTextField.getText() + dayTextField.getText();
+					String date = yearTextField.getText() + String.format("%02d", Integer.parseInt(monthTextField.getText())) + String.format("%02d", Integer.parseInt(dayTextField.getText()));
 					ArrayList<TrainVo> list = TrainAPI.getInstance().getTrainList(depText, arrText, date);
 					new TrainInquiryMenu(list, thisObj, personnel).setVisible(true);
 					setVisible(false);
@@ -654,9 +664,9 @@ public class MainMenu extends JFrame {
 				}
 			}
 		});
-		reservationButton.setFont(new Font("맑은 고딕", Font.PLAIN, 24));
-		reservTicketPanel.add(reservationButton, BorderLayout.SOUTH);
-		reservTicketTabbedPane.setTabComponentAt(1, roundTripLabel);
+		trainInquiryButton.setFont(new Font("맑은 고딕", Font.PLAIN, 24));
+		reservTicketPanel.add(trainInquiryButton, BorderLayout.SOUTH);
+		
 		// #####################################################
 
 		// #####################################################
@@ -686,7 +696,9 @@ public class MainMenu extends JFrame {
 		gbl_ticketListPanel.columnWeights = new double[]{1.0, Double.MIN_VALUE};
 		gbl_ticketListPanel.rowWeights = new double[]{1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, Double.MIN_VALUE};
 		ticketListPanel.setLayout(gbl_ticketListPanel);
+		ticketListPanel.setBackground(new Color(0x77, 0x88, 0x99));
 		ticketConfirmScrollPane.getVerticalScrollBar().setUnitIncrement(16);
+		ticketConfirmScrollPane.getHorizontalScrollBar().setUnitIncrement(16);
 		
 		GridBagConstraints gbc_ticketConfirmScrollPane = new GridBagConstraints();
 		gbc_ticketConfirmScrollPane.fill = GridBagConstraints.BOTH;
@@ -725,19 +737,34 @@ public class MainMenu extends JFrame {
 		dao.insertReservationData(userVo.getId(), ticketId);
 	}
 
-	private void UpdateTicketList() {
+	public void UpdateTicketList() {
 		ticketListPanel.removeAll();
 		ArrayList<TicketVo> tickets = dao.getTicketList(userVo.getId());
 		if(tickets != null) {
+			tickets.sort(new Comparator<TicketVo>() {
+				public int compare(TicketVo o1, TicketVo o2) {
+					return o1.getTicketing_day().compareTo(o2.getTicketing_day());
+				}
+			});
+			
 			for(int i = 0; i < tickets.size(); i++) {
+				
+				String today = Constants.getTodayDateToString();
+				if(today.compareTo(tickets.get(i).getArrpland_time()) > 0) {
+					dao.deleteReservation(tickets.get(i));
+					tickets.remove(i);
+					continue;
+				}
+				
 				GridBagConstraints gbc_panel = new GridBagConstraints();
 				gbc_panel.insets = new Insets(0, 0, 5, 0);
 				gbc_panel.fill = GridBagConstraints.BOTH;
 				gbc_panel.gridx = 0;
 				gbc_panel.gridy = i;
-				ticketListPanel.add(new TicketInformationPanel(tickets.get(i)), gbc_panel);
+				ticketListPanel.add(new TicketInformationPanel(tickets.get(i), this), gbc_panel);
 			}
 		}
+		ticketListPanel.updateUI();
 	}
 	
 	private void setWelcoming() {
@@ -830,6 +857,8 @@ public class MainMenu extends JFrame {
 	}
 
 	private void increaseCount(JTextField tf) {
+		if(personnel >= 9) return;
+		personnel++;
 		setNumberLimit(tf);
 		int tmp = Integer.parseInt(tf.getText());
 		tmp++;
@@ -839,6 +868,7 @@ public class MainMenu extends JFrame {
 	}
 
 	private void decreaseCount(JTextField tf) {
+		personnel--;
 		setNumberLimit(tf);
 		int tmp = Integer.parseInt(tf.getText());
 		tmp--;

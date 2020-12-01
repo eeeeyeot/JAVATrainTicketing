@@ -33,6 +33,7 @@ public class TicketViewMenu extends JFrame {
 	JLabel depPlandTime;
 	JLabel arrPlandTime;
 	JLabel trainInfoLabel;
+	
 	JLabel seatLabel;
 	JLabel personnelLabel;
 	JLabel priceLabel;
@@ -210,83 +211,74 @@ public class TicketViewMenu extends JFrame {
 		contentPane.add(reservationInfoPanel, gbc_reservationInfoPanel);
 		reservationInfoPanel.setLayout(new GridLayout(0, 1, 0, 0));
 		
-		JPanel reservTitlePanel = new JPanel();
-		reservationInfoPanel.add(reservTitlePanel);
-		GridBagLayout gbl_reservTitlePanel = new GridBagLayout();
-		gbl_reservTitlePanel.columnWidths = new int[]{69, 37, 37, 0};
-		gbl_reservTitlePanel.rowHeights = new int[]{21, 0};
-		gbl_reservTitlePanel.columnWeights = new double[]{1.0, 1.0, 1.0, Double.MIN_VALUE};
-		gbl_reservTitlePanel.rowWeights = new double[]{1.0, Double.MIN_VALUE};
-		reservTitlePanel.setLayout(gbl_reservTitlePanel);
-		reservTitlePanel.setBorder(titled);
+		JPanel reservationGridPanel = new JPanel();
+		reservationInfoPanel.add(reservationGridPanel);
+		GridBagLayout gbl_reservationGridPanel = new GridBagLayout();
+		gbl_reservationGridPanel.columnWidths = new int[] {191, 80, 191, 0};
+		gbl_reservationGridPanel.rowHeights = new int[]{71, 0};
+		gbl_reservationGridPanel.columnWeights = new double[]{1.0, 0.0, 1.0, Double.MIN_VALUE};
+		gbl_reservationGridPanel.rowWeights = new double[]{0.0, Double.MIN_VALUE};
+		reservationGridPanel.setLayout(gbl_reservationGridPanel);
+		
+		JPanel seatPnel = new JPanel();
+		seatPnel.setBorder(titled);
+		GridBagConstraints gbc_seatPnel = new GridBagConstraints();
+		gbc_seatPnel.fill = GridBagConstraints.BOTH;
+		gbc_seatPnel.insets = new Insets(0, 0, 0, 5);
+		gbc_seatPnel.gridx = 0;
+		gbc_seatPnel.gridy = 0;
+		reservationGridPanel.add(seatPnel, gbc_seatPnel);
+		seatPnel.setLayout(new GridLayout(0, 1, 0, 0));
 		
 		JLabel seatTitleLabel = new JLabel("좌석 번호");
 		seatTitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		seatTitleLabel.setFont(new Font("나눔스퀘어", Font.PLAIN, 18));
-		GridBagConstraints gbc_seatTitleLabel = new GridBagConstraints();
-		gbc_seatTitleLabel.fill = GridBagConstraints.BOTH;
-		gbc_seatTitleLabel.insets = new Insets(0, 0, 0, 5);
-		gbc_seatTitleLabel.gridx = 0;
-		gbc_seatTitleLabel.gridy = 0;
-		reservTitlePanel.add(seatTitleLabel, gbc_seatTitleLabel);
-		
-		JLabel personnelTitleLabel = new JLabel("인 원");
-		personnelTitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		personnelTitleLabel.setFont(new Font("나눔스퀘어", Font.PLAIN, 18));
-		GridBagConstraints gbc_personnelTitleLabel = new GridBagConstraints();
-		gbc_personnelTitleLabel.fill = GridBagConstraints.BOTH;
-		gbc_personnelTitleLabel.insets = new Insets(0, 0, 0, 5);
-		gbc_personnelTitleLabel.gridx = 1;
-		gbc_personnelTitleLabel.gridy = 0;
-		reservTitlePanel.add(personnelTitleLabel, gbc_personnelTitleLabel);
-		
-		JLabel priceTitleLabel = new JLabel("가 격");
-		priceTitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		priceTitleLabel.setFont(new Font("나눔스퀘어", Font.PLAIN, 18));
-		GridBagConstraints gbc_priceTitleLabel = new GridBagConstraints();
-		gbc_priceTitleLabel.fill = GridBagConstraints.BOTH;
-		gbc_priceTitleLabel.gridx = 2;
-		gbc_priceTitleLabel.gridy = 0;
-		reservTitlePanel.add(priceTitleLabel, gbc_priceTitleLabel);
-		
-		JPanel reservPanel = new JPanel();
-		reservationInfoPanel.add(reservPanel);
-		reservPanel.setBorder(titled);
-		GridBagLayout gbl_reservPanel = new GridBagLayout();
-		gbl_reservPanel.columnWidths = new int[]{84, 11, 48, 0};
-		gbl_reservPanel.rowHeights = new int[]{21, 0};
-		gbl_reservPanel.columnWeights = new double[]{1.0, 1.0, 1.0, Double.MIN_VALUE};
-		gbl_reservPanel.rowWeights = new double[]{1.0, Double.MIN_VALUE};
-		reservPanel.setLayout(gbl_reservPanel);
+		seatTitleLabel.setFont(new Font("Dialog", Font.PLAIN, 18));
+		seatPnel.add(seatTitleLabel);
 		
 		seatLabel = new JLabel("00, 00, 00");
 		seatLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		seatLabel.setFont(new Font("나눔스퀘어", Font.PLAIN, 18));
-		GridBagConstraints gbc_seatLabel = new GridBagConstraints();
-		gbc_seatLabel.fill = GridBagConstraints.BOTH;
-		gbc_seatLabel.insets = new Insets(0, 0, 0, 5);
-		gbc_seatLabel.gridx = 0;
-		gbc_seatLabel.gridy = 0;
-		reservPanel.add(seatLabel, gbc_seatLabel);
+		seatLabel.setFont(new Font("Dialog", Font.PLAIN, 18));
+		seatPnel.add(seatLabel);
+		seatLabel.validate();
+		
+		JPanel personnelPanel = new JPanel();
+		personnelPanel.setBorder(titled);
+		GridBagConstraints gbc_personnelPanel = new GridBagConstraints();
+		gbc_personnelPanel.fill = GridBagConstraints.BOTH;
+		gbc_personnelPanel.insets = new Insets(0, 0, 0, 5);
+		gbc_personnelPanel.gridx = 1;
+		gbc_personnelPanel.gridy = 0;
+		reservationGridPanel.add(personnelPanel, gbc_personnelPanel);
+		personnelPanel.setLayout(new GridLayout(0, 1, 0, 0));
+		
+		JLabel personnelTitleLabel = new JLabel("인 원");
+		personnelTitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		personnelTitleLabel.setFont(new Font("Dialog", Font.PLAIN, 18));
+		personnelPanel.add(personnelTitleLabel);
 		
 		personnelLabel = new JLabel("3");
 		personnelLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		personnelLabel.setFont(new Font("나눔스퀘어", Font.PLAIN, 18));
-		GridBagConstraints gbc_personnelLabel = new GridBagConstraints();
-		gbc_personnelLabel.fill = GridBagConstraints.BOTH;
-		gbc_personnelLabel.insets = new Insets(0, 0, 0, 5);
-		gbc_personnelLabel.gridx = 1;
-		gbc_personnelLabel.gridy = 0;
-		reservPanel.add(personnelLabel, gbc_personnelLabel);
+		personnelLabel.setFont(new Font("Dialog", Font.PLAIN, 18));
+		personnelPanel.add(personnelLabel);
+		
+		JPanel pricePanel = new JPanel();
+		GridBagConstraints gbc_pricePanel = new GridBagConstraints();
+		gbc_pricePanel.fill = GridBagConstraints.BOTH;
+		gbc_pricePanel.gridx = 2;
+		gbc_pricePanel.gridy = 0;
+		reservationGridPanel.add(pricePanel, gbc_pricePanel);
+		pricePanel.setLayout(new GridLayout(0, 1, 0, 0));
+		
+		JLabel priceTitleLabel = new JLabel("가 격");
+		priceTitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		priceTitleLabel.setFont(new Font("Dialog", Font.PLAIN, 18));
+		pricePanel.add(priceTitleLabel);
 		
 		priceLabel = new JLabel("3,000");
 		priceLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		priceLabel.setFont(new Font("나눔스퀘어", Font.PLAIN, 18));
-		GridBagConstraints gbc_priceLabel = new GridBagConstraints();
-		gbc_priceLabel.fill = GridBagConstraints.BOTH;
-		gbc_priceLabel.gridx = 2;
-		gbc_priceLabel.gridy = 0;
-		reservPanel.add(priceLabel, gbc_priceLabel);
+		priceLabel.setFont(new Font("Dialog", Font.PLAIN, 18));
+		pricePanel.add(priceLabel);
+		pricePanel.setBorder(titled);
 	}
 
 	public TicketViewMenu(TicketVo ticket) {
@@ -297,7 +289,27 @@ public class TicketViewMenu extends JFrame {
 		depPlandTime.setText(getTime(ticket.getDeppland_time()));
 		arrPlandTime.setText(getTime(ticket.getArrpland_time()));
 		trainInfoLabel.setText(ticket.getTrain_name() + "   " + ticket.getCar_number());
-		seatLabel.setText(ticket.getSeat());
+		
+		int seatLength;
+		if(ticket.getSeat().equals("null")) {
+			seatLabel.setText("");
+			seatLength = 0;
+		}
+		else {
+			seatLabel.setText(ticket.getSeat());
+			seatLength = ticket.getSeat().split(" ").length;
+		}
+		
+		int personnel = Integer.parseInt(ticket.getPersonnel());
+		if(seatLength < personnel) {
+			String mult = "";
+			int remains = personnel - seatLength;
+			if(remains > 1)
+				mult = "X" + remains;
+			seatLabel.setText(seatLabel.getText() + " " + "입석" + mult);	
+		}
+		seatLabel.validate();
+		
 		personnelLabel.setText(ticket.getPersonnel());
 		priceLabel.setText(ticket.getPrice());
 	}

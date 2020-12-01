@@ -5,9 +5,10 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -193,8 +194,6 @@ public class StartMenu extends JFrame {
 		contentPane.add(signInPanel);
 		signInPanel.setLayout(new BorderLayout(0, 0));
 
-		
-
 		JPanel gridPanel = new JPanel();
 		gridPanel.setBorder(null);
 		signInPanel.add(gridPanel, BorderLayout.NORTH);
@@ -240,7 +239,6 @@ public class StartMenu extends JFrame {
 		inputPanel.add(pwLabel, gbc_pwLabel);
 
 		passwordField_in = new JPasswordField();
-		passwordField_in.setToolTipText("1q2w3e4r");
 		passwordField_in.setFont(new Font("굴림", Font.PLAIN, 14));
 		GridBagConstraints gbc_passwordField_in = new GridBagConstraints();
 		gbc_passwordField_in.fill = GridBagConstraints.HORIZONTAL;
@@ -300,25 +298,24 @@ public class StartMenu extends JFrame {
 				System.out.println("회원 가입");
 				signUpPanel.setVisible(true);
 			}
-
 		});
 
-		Window thisWindow = this;
 		// 로그인 버튼
 		signinButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				UserVo userVo;
-				if ((userVo = dao.checkLoginData(idTextField_in.getText(), String.valueOf(passwordField_in.getPassword()))) != null) {
-					new MainMenu(userVo, thisWindow).setVisible(true);
-					//dispose();
-					setVisible(false);
-				} else {
-					showDialog("ID / PW 가 틀렸습니다");
-					
-				}
+				signIn();
 			}
 		});
 		setLocation(ScreenUtil.getCenterPosition(this));
+		
+		passwordField_in.addKeyListener(new KeyAdapter() {
+			public void keyReleased(KeyEvent e) {
+				if(e.getKeyCode() == KeyEvent.VK_ENTER)
+				{
+					signIn();
+				}
+			}
+		});
 	}
 
 	@SuppressWarnings("unused")
@@ -335,6 +332,16 @@ public class StartMenu extends JFrame {
 			else {
 				((JPasswordField)c).setText("");
 			}
+		}
+	}
+	private void signIn() {
+		UserVo userVo;
+		if ((userVo = dao.checkLoginData(idTextField_in.getText(), String.valueOf(passwordField_in.getPassword()))) != null) {
+			new MainMenu(userVo, this).setVisible(true);
+			//dispose();
+			setVisible(false);
+		} else {
+			showDialog("ID / PW 가 틀렸습니다");
 		}
 	}
 	

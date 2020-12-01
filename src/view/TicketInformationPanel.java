@@ -1,19 +1,27 @@
 package view;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+import constants.Constants;
 import database.TicketVo;
+import database.TrainDAO;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -22,36 +30,68 @@ import java.util.Calendar;
 public class TicketInformationPanel extends JPanel implements ActionListener{
 	
 	private TicketVo ticket;
+	private JFrame parent;
 	
 	private JLabel[] labels = new JLabel[4];
 	private JButton detailButton = new JButton("상세보기");
+	private JPopupMenu pMenu = new JPopupMenu("설정");
+	
 	private SimpleDateFormat sf;
 	Calendar cal;
 	
 	// 출발지 -> 목적지  / 날짜  / 시간  / 인원
-	public TicketInformationPanel(TicketVo ticket) {
-		setLayout(new GridLayout(1, 0, 0, 0));
+	public TicketInformationPanel(TicketVo ticket, JFrame parent) {
+		setLayout(new BorderLayout());
 		this.ticket = ticket;
-		
+		this.parent = parent;
 		sf = new SimpleDateFormat("yyyyMMddHHmm");
 		cal = Calendar.getInstance();
-		
 		TitledBorder titled = new TitledBorder(new LineBorder(Color.black, 2));
-		Font font = new Font("맑은 고딕", Font.BOLD, 18);
+		Font font = new Font("맑은 고딕", Font.BOLD, 17);
+		
+		JPanel northPanel = new JPanel();
+		northPanel.setLayout(new GridLayout(1, 0));
+		JPanel centerPanel = new JPanel();
+		centerPanel.setLayout(new GridLayout(1, 0, 0, 0));
+		add(centerPanel, "Center");
 		
 		for(int i = 0; i < labels.length; i++) {
 			labels[i] = new JLabel();
 			labels[i].setFont(font);
-			add(labels[i]);
+			centerPanel.add(labels[i]);
 			labels[i].setBorder(titled);
 			labels[i].setHorizontalAlignment(SwingConstants.CENTER);
 		}
 		
-		detailButton.setBorder(titled);
-		detailButton.setFont(font);
-		detailButton.addActionListener(this);
-		add(detailButton);
+		JLabel ticketingTimeLabel = new JLabel("예매 날짜 : " + Constants.getDateKorean(ticket.getTicketing_day()));
+		ticketingTimeLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		ticketingTimeLabel.setFont(new Font("맑은 고딕", Font.BOLD, 14));
+		ticketingTimeLabel.setBackground(Color.white);
+		northPanel.add(ticketingTimeLabel);
+		northPanel.setBackground(new Color(0xE1, 0xFF, 0xFF));
+		add(northPanel, "North");
 		
+		detailButton.setFont(font);
+		detailButton.setBorder(titled);
+		detailButton.addActionListener(this);
+		centerPanel.add(detailButton);
+		centerPanel.setBackground(new Color(0xF0, 0xFF, 0xFF));
+		
+		JMenuItem jmiCancel = new JMenuItem("예매 취소");
+		jmiCancel.setFont(font);
+		pMenu.add(jmiCancel);
+		JPanel thisP = this;
+		
+		jmiCancel.addActionListener(this);
+		addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				if(e.getModifiers() == MouseEvent.BUTTON3_MASK) {
+					pMenu.show(thisP, e.getX(), e.getY());
+				}
+			}
+		});
+
+		setBorder(titled);
 		setLocation(ticket.getDeppland_place(), ticket.getArrpland_place());
 		setDate(ticket.getDeppland_time());
 		setTime();
@@ -59,7 +99,7 @@ public class TicketInformationPanel extends JPanel implements ActionListener{
 	}
 	
 	public void setLocation(String dep, String arr) {
-		labels[0].setText(dep + " → " + arr);
+		labels[0].setText("<html><center>출발&nbsp;&nbsp;&emsp;도착</center>" + "<center>" + dep + " → " + arr + "</center></html>");
 	}
 	
 	public void setDate(String date) {
@@ -98,7 +138,15 @@ public class TicketInformationPanel extends JPanel implements ActionListener{
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		new TicketViewMenu(ticket).setVisible(true);
+		if(e.getSource() instanceof JButton)
+			new TicketViewMenu(ticket).setVisible(true);
+		else if(e.getSource() instanceof JMenuItem)
+		{
+			TrainDAO dao = TrainDAO.getInstance();
+			dao.deleteReservation(ticket);
+			((MainMenu)parent).UpdateTicketList();
+			new NoticeDialog("티켓이 취소되었습니다.", parent);
+		}
 	}
 }
 

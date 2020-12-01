@@ -7,7 +7,7 @@ import java.util.Calendar;
 public class TrainVo
 {
 	private String trainName;
-	private String trainNo;
+	private String carNumber;
 	private String depplandTime;
 	private String arrplandTime;
 	private String depPlace;
@@ -16,7 +16,7 @@ public class TrainVo
 	public TrainVo() {}
 	public TrainVo(String trainName, String trainNo, String depplandTime, String arrplandTime, String depPlace, String arrPlace) {
 		this.trainName = trainName;
-		this.trainNo = trainNo;
+		this.carNumber = trainNo;
 		this.depplandTime = depplandTime;
 		this.arrplandTime = arrplandTime;
 		this.depPlace = depPlace;
@@ -26,8 +26,8 @@ public class TrainVo
 	public String getTrainName() { return trainName; }
 	public void setName(String name) { this.trainName = name; }
 	
-	public String getTrainNo() { return trainNo; }
-	public void setTrainNo(String trainNo) { this.trainNo = trainNo; }
+	public String getCarNumber() { return carNumber; }
+	public void setCarNumber(String trainNo) { this.carNumber = trainNo; }
 	
 	public String getDepplandTime() { return depplandTime; }
 	public void setDepplandTime(String depplandTime) { this.depplandTime = depplandTime; }
@@ -36,11 +36,11 @@ public class TrainVo
 	public void setArrplandTime(String arrplandTime) { this.arrplandTime = arrplandTime; }
 	
 	public String toString() {
-		return trainName + " "+ trainNo + " " + dateFormatToString(depplandTime) + " " + dateFormatToString(arrplandTime);
+		return trainName + " "+ carNumber + " " + dateFormatToString(depplandTime) + " " + dateFormatToString(arrplandTime);
 	}
 	
 	public String toFileString() {
-		return trainName + " "+ trainNo + " " + depplandTime + " " + arrplandTime;
+		return trainName + " "+ carNumber + " " + depplandTime + " " + arrplandTime;
 	}
 	
 	public String dateFormatToString(String date) {

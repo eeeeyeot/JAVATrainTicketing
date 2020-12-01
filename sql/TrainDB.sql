@@ -6,7 +6,7 @@ CREATE TABLE userdata
 	contact		varchar(15),
 	register_date	DATE,
 	CONSTRAINT pk_userdata PRIMARY KEY (user_id)
-)
+);
 
 CREATE TABLE reservation 
 (
@@ -15,7 +15,7 @@ CREATE TABLE reservation
 	CONSTRAINT pk_reservation PRIMARY KEY (ticket_id),
 	CONSTRAINT fk_reservation FOREIGN KEY (user_id)
 	REFERENCES userdata (user_id)
-)
+);
 
 CREATE TABLE Ticket (
 	ticket_id		number(10) NOT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE Ticket (
 	expiration_date	DATE,
 	CONSTRAINT fk_ticket FOREIGN KEY (ticket_id)
 	REFERENCES reservation (ticket_id)
-)
+);
 
 CREATE TABLE fee
 (
@@ -43,4 +43,4 @@ CREATE TABLE fee
 	standing_price		int NOT NULL,
 	seat_price			int NOT NULL,
 	CONSTRAINT pk_fare PRIMARY KEY (passenger_type)
-)
+);

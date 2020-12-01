@@ -11,11 +11,14 @@ import java.util.Calendar;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.JButton;
+
 import java.awt.Font;
 import java.awt.Color;
+
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+import database.TrainDAO;
 import openAPI.*;
 
 @SuppressWarnings("serial")
@@ -23,40 +26,51 @@ public class TrainInformationPanel extends JPanel implements ActionListener{
 	private JLabel trainIdentityLabel;
 	private JLabel depplandTimeLabel;
 	private JLabel arrplandTimeLabel;
+	private JLabel personnelLabel;
 	private JButton priceButton;
 	
 	private TrainInquiryMenu parent;
+	private TrainDAO dao;
 	private TrainVo vo;
-
+	
+	int emptySeat;
 	
 	public TrainInformationPanel() {
 		setForeground(Color.BLACK);
 		setBorder(null);
-		setLayout(new GridLayout(0, 4, 0, 0));
+		setLayout(new GridLayout(1, 4, 0, 0));
+		
+		Font font = new Font("맑은 고딕", Font.PLAIN, 20);
 		
 		trainIdentityLabel = new JLabel();
-		trainIdentityLabel.setFont(new Font("굴림", Font.PLAIN, 20));
+		trainIdentityLabel.setFont(font);
 		trainIdentityLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		add(trainIdentityLabel);
 		
 		depplandTimeLabel = new JLabel();
-		depplandTimeLabel.setFont(new Font("굴림", Font.PLAIN, 20));
+		depplandTimeLabel.setFont(font);
 		depplandTimeLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		add(depplandTimeLabel);
 		
 		arrplandTimeLabel = new JLabel();
-		arrplandTimeLabel.setFont(new Font("굴림", Font.PLAIN, 20));
+		arrplandTimeLabel.setFont(font);
 		arrplandTimeLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		add(arrplandTimeLabel);
 		
-		priceButton = new JButton("0,000원");
-		priceButton.setFont(new Font("굴림", Font.PLAIN, 20));
+		personnelLabel = new JLabel();
+		personnelLabel.setFont(font);
+		personnelLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		add(personnelLabel);
+		
+		priceButton = new JButton("1,000원");
+		priceButton.setFont(font);
 		add(priceButton);
 		
 		TitledBorder titled = new TitledBorder(new LineBorder(Color.black, 2));
 		trainIdentityLabel.setBorder(titled);
 		depplandTimeLabel.setBorder(titled);
 		arrplandTimeLabel.setBorder(titled);
+		personnelLabel.setBorder(titled);
 		priceButton.setBorder(titled);
 		
 		priceButton.addActionListener(this);
@@ -66,9 +80,18 @@ public class TrainInformationPanel extends JPanel implements ActionListener{
 		this();
 		this.parent = parent;
 		this.vo = vo;
-		trainIdentityLabel.setText("<html>" + vo.getTrainName() + "<br><center>" + vo.getTrainNo() + "</center></html>");
+		dao = TrainDAO.getInstance();
+		trainIdentityLabel.setText("<html>" + vo.getTrainName() + "<br><center>" + vo.getCarNumber() + "</center></html>");
 		depplandTimeLabel.setText(toDate(vo.getDepplandTime()));
 		arrplandTimeLabel.setText(toDate(vo.getArrplandTime()));
+		
+		emptySeat = dao.getEmptySeatCount(vo);
+		if(emptySeat == 0) {
+			personnelLabel.setText("좌석 없음");
+		}
+		else {
+			personnelLabel.setText(dao.getEmptySeatCount(vo) + " 좌석 여유");
+		}
 	}
 	
 	public String toDate(String time) {
@@ -89,7 +112,16 @@ public class TrainInformationPanel extends JPanel implements ActionListener{
 		parent.initSeatButton(vo);
 	}
 	
+	public boolean hasEmptySeat(int personnel) {
+		if(personnel <= emptySeat)
+			return true;
+		else
+			return false;
+	}
 	
+	public void setEnabled(boolean enabled) {
+		this.setBackground(Color.LIGHT_GRAY);
+	}
 }
 
 

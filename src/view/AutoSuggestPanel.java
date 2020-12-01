@@ -1,5 +1,7 @@
 package view;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -24,10 +26,14 @@ public class AutoSuggestPanel extends JPanel{
 	AutoSuggestPanel(){
 		v = TrainAPI.getInstance().getStationNames();
 		setLayout(new GridBagLayout());
-		
+		Font font = new Font("맑은 고딕", Font.BOLD, 12); 
 		combo = new JComboBox<String>(v);
 		combo.setEditable(true);
+		combo.setFont(font);
+		combo.setBackground(Color.WHITE);
+		
 		tf = (JTextField) combo.getEditor().getEditorComponent();
+		tf.setFont(font);
 
 		tf.addFocusListener(new FocusAdapter() {
 			public void focusGained(FocusEvent e) {

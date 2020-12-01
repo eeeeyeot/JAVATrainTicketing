@@ -283,7 +283,7 @@ public class TrainAPI
 						//기차 이름
 						ti.setName(getTagValue("traingradename", eElement));
 						//기차 번호
-						ti.setTrainNo(getTagValue("trainno", eElement));
+						ti.setCarNumber(getTagValue("trainno", eElement));
 						//출발역
 						ti.setDepPlace(depPlace);
 						//도착역

@@ -45,13 +45,44 @@ public class TrainDAO
 		return instance;
 	}
 	
+	public int getEmptySeatCount(TrainVo vo) {
+		int cnt = 0;
+		
+		String sql = "SELECT seat FROM TICKET WHERE train_name = '" + vo.getTrainName() + 
+				"' and car_number = " + vo.getCarNumber() + " AND DEPPLAND_TIME BETWEEN " +
+				"to_date('" + vo.getDepplandTime() + "', 'yyyyMMddHH24MI') AND to_date('" + 
+				vo.getArrplandTime() + "', 'yyyyMMddHH24MI')";
+		try {
+			rs = stmt.executeQuery(sql);
+			
+			while(rs.next()) {
+				String[] seats = rs.getString("SEAT").split(" ");
+				for(String s : seats) {
+					if(!s.equals("null"))
+						cnt++;
+				}
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return 40 - cnt;
+	}
+	
 	public ArrayList<String> getSeatList(TrainVo vo)
 	{
 		ArrayList<String> list = new ArrayList<String>();
 		
 		try {
+			//출발 시간과
 			String sql = "SELECT seat FROM TICKET WHERE train_name = '" + vo.getTrainName() + 
-					"' and car_number = '" + vo.getTrainNo() + "'";
+					"' and car_number = " + vo.getCarNumber() + " AND DEPPLAND_TIME BETWEEN " +
+					"to_date('" + vo.getDepplandTime() + "', 'yyyyMMddHH24MI') AND to_date('" + 
+					vo.getArrplandTime() + "', 'yyyyMMddHH24MI')";
 			System.out.println(sql);
 			
 			rs = stmt.executeQuery(sql);
@@ -135,6 +166,23 @@ public class TrainDAO
 			rs = stmt.executeQuery(sql);
 		}
 		catch(Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public boolean deleteReservation(TicketVo ticket) {
+		try {
+			String sql = "delete from ticket where ticket_id = " + ticket.getTicket_id();
+			System.out.println(sql);
+			rs = stmt.executeQuery(sql);
+			
+			sql = "DELETE FROM reservation WHERE ticket_id = " + ticket.getTicket_id();
+			System.out.println(sql);
+			rs = stmt.executeQuery(sql);
+		}catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -250,7 +298,7 @@ public class TrainDAO
 		}
 		
 		sb.append(cal.get(Calendar.YEAR)).append(String.format("%02d", cal.get(Calendar.MONTH) + 1))
-			.append(String.format("%02d", cal.get(Calendar.DAY_OF_MONTH))).append(String.format("%02d", cal.get(Calendar.HOUR)))
+			.append(String.format("%02d", cal.get(Calendar.DAY_OF_MONTH))).append(String.format("%02d", cal.get(Calendar.HOUR_OF_DAY)))
 			.append(String.format("%02d", cal.get(Calendar.MINUTE)));
 		
 		return sb.toString();

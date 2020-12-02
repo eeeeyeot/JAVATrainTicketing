@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import constants.Constants;
 import openAPI.TrainVo;
 
 @SuppressWarnings("unused")
@@ -115,9 +116,13 @@ public class TrainDAO
 			
 			System.out.println(sql);
 			rs = stmt.executeQuery(sql);
-			rsmd = rs.getMetaData();
 			
 			while(rs.next()) {
+				if(Constants.getTodayTimeToString().compareTo(getDateToString(rs.getString("ARRPLAND_TIME"))) > 0) {
+					deleteReservation(rs.getString("TICKET_ID"));
+					continue;
+				}
+				
 				TicketVo vo = new TicketVo();
 				
 				vo.setTicket_id(rs.getString("TICKET_ID"));
@@ -173,16 +178,17 @@ public class TrainDAO
 		return true;
 	}
 	
-	public boolean deleteReservation(TicketVo ticket) {
+	public boolean deleteReservation(String ticket_id) {
 		try {
-			String sql = "delete from ticket where ticket_id = " + ticket.getTicket_id();
+			String sql = "DELETE FROM ticket WHERE ticket_id = " + ticket_id;
 			System.out.println(sql);
-			rs = stmt.executeQuery(sql);
+			ResultSet rs = stmt.executeQuery(sql);
 			
-			sql = "DELETE FROM reservation WHERE ticket_id = " + ticket.getTicket_id();
+			sql = "DELETE FROM reservation WHERE ticket_id = " + ticket_id;
 			System.out.println(sql);
 			rs = stmt.executeQuery(sql);
-		}catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}

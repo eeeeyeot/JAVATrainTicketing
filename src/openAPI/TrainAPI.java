@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -17,6 +18,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import constants.Constants;
 
 //출발지 도착지 출발일
 public class TrainAPI
@@ -87,9 +90,16 @@ public class TrainAPI
 		try {
 			list = new ArrayList<TrainVo>();
 			BufferedReader br = new BufferedReader(new FileReader(directory));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(directory, true));
 			String currentLine;
 			while((currentLine = br.readLine()) != null) {
 				String[] str = currentLine.split(" ");
+				if(Constants.getTodayTimeToString().compareTo(str[2]) > 0) {
+					currentLine = "";
+					bw.write(currentLine + System.getProperty("line.separator"));
+					continue;
+				}
+				
 				TrainVo vo = new TrainVo(str[0], str[1], str[2], str[3], depPlaceName, arrPlaceName);
 				list.add(vo);
 			}
@@ -97,13 +107,22 @@ public class TrainAPI
 		}
 		catch (FileNotFoundException e) {
 			list = getTrainInfo(depPlaceName, arrPlaceName, depPlandTime);
+			
 			try {
-				BufferedWriter fw = new BufferedWriter(new FileWriter(directory, true));
-				for(TrainVo vo : list) {
-					fw.write(vo.toFileString() + "\n");
+				BufferedWriter bw = new BufferedWriter(new FileWriter(directory, true));
+				Iterator<TrainVo> iter = list.iterator();
+				
+				while(iter.hasNext()) {
+					TrainVo vo = iter.next();
+					System.out.println(vo.toString());
+					if(Constants.getTodayTimeToString().compareTo(vo.getDepplandTime()) > 0) {
+						iter.remove();
+						continue;
+					}
+					bw.write(vo.toFileString() + System.getProperty("line.separator"));
 				}
-				fw.flush();
-				fw.close();
+				bw.flush();
+				bw.close();
 				System.out.println(directory + " write");
 			}
 			catch(Exception ee) {
@@ -241,21 +260,21 @@ public class TrainAPI
 	}
 
 	//get train informations from open API
-	private ArrayList<TrainVo> getTrainInfo(String depPlace, String arrPlace, String depPlandTime)
+	private ArrayList<TrainVo> getTrainInfo(String depPlace, String arrPlace, String depPlandDate)
 	{
 		String depPlaceId = getValue(arrStation, depPlace);
 		String arrPlaceId = getValue(arrStation, arrPlace);
-		
 		ArrayList<TrainVo> trainInfo = new ArrayList<TrainVo>();
+		
 		try
 		{
 			StringBuilder			urlBuilder	= new StringBuilder(url + "getStrtpntAlocFndTrainInfo");
 			urlBuilder.append("?" + URLEncoder.encode("ServiceKey", "UTF-8") + "=" + SERVICE_KEY); /* Service Key */
-			urlBuilder.append("&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("10", "UTF-8")); /* 한 페이지 결과 수 */
+			urlBuilder.append("&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("100", "UTF-8")); /* 한 페이지 결과 수 */
 			urlBuilder.append("&" + URLEncoder.encode("pageNo", "UTF-8") + "=" + URLEncoder.encode("1", "UTF-8")); /* 페이지 번호 */
 			urlBuilder.append("&" + URLEncoder.encode("depPlaceId", "UTF-8") + "=" + URLEncoder.encode(depPlaceId, "UTF-8")); /* 출발기차역ID */
 			urlBuilder.append("&" + URLEncoder.encode("arrPlaceId", "UTF-8") + "=" + URLEncoder.encode(arrPlaceId, "UTF-8")); /* 도착기차역ID */
-			urlBuilder.append("&" + URLEncoder.encode("depPlandTime", "UTF-8") + "=" + URLEncoder.encode(depPlandTime, "UTF-8")); /* 출발일 */
+			urlBuilder.append("&" + URLEncoder.encode("depPlandTime", "UTF-8") + "=" + URLEncoder.encode(depPlandDate, "UTF-8")); /* 출발일 */
 			
 			for(MyDictionary<String> md : arrTrain)
 			{
@@ -374,7 +393,7 @@ public class TrainAPI
 				StringBuilder urlBuilder = new StringBuilder(url + "getCtyAcctoTrainSttnList"); /* URL */
 				urlBuilder.append("?" + URLEncoder.encode("ServiceKey", "UTF-8") + "=" + SERVICE_KEY); /* Service Key */
 				urlBuilder.append("&" + URLEncoder.encode("numOfRows", "UTF-8") + "="
-						+ URLEncoder.encode("10", "UTF-8")); /* 한 페이지 결과 수 */
+						+ URLEncoder.encode("100", "UTF-8")); /* 한 페이지 결과 수 */
 				urlBuilder.append("&" + URLEncoder.encode("pageNo", "UTF-8") + "="
 						+ URLEncoder.encode("1", "UTF-8")); /* 페이지 번호 */
 				urlBuilder.append("&" + URLEncoder.encode("cityCode", "UTF-8") + "="

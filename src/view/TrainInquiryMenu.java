@@ -53,7 +53,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 	private JPanel contentPane;
 	
 	private ArrayList<TrainVo> trainList;
-	private JPanel trainInfomationsPanel;
+	private JPanel trainListPanel;
 	private JLayeredPane refLayeredPane;
 	private JPanel refTrainList;
 	private JLabel refDepStation;
@@ -144,20 +144,20 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		gbl_layeredPane.rowWeights = new double[]{1.0, Double.MIN_VALUE};
 		layeredPane.setLayout(gbl_layeredPane);
 		
-		JPanel trainListPanel = new JPanel();
-		layeredPane.setLayer(trainListPanel, 2);
-		GridBagConstraints gbc_trainListPanel = new GridBagConstraints();
-		gbc_trainListPanel.fill = GridBagConstraints.BOTH;
-		gbc_trainListPanel.gridx = 0;
-		gbc_trainListPanel.gridy = 0;
-		layeredPane.add(trainListPanel, gbc_trainListPanel);
-		GridBagLayout gbl_trainListPanel = new GridBagLayout();
-		gbl_trainListPanel.columnWidths = new int[]{977, 0};
-		gbl_trainListPanel.rowHeights = new int[]{35, 20, 26, 414, 0};
-		gbl_trainListPanel.columnWeights = new double[]{0.0, Double.MIN_VALUE};
-		gbl_trainListPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
-		trainListPanel.setLayout(gbl_trainListPanel);
-		trainListPanel.setBorder(titled);
+		JPanel selectTrainPanel = new JPanel();
+		layeredPane.setLayer(selectTrainPanel, 2);
+		GridBagConstraints gbc_selectTrainPanel = new GridBagConstraints();
+		gbc_selectTrainPanel.fill = GridBagConstraints.BOTH;
+		gbc_selectTrainPanel.gridx = 0;
+		gbc_selectTrainPanel.gridy = 0;
+		layeredPane.add(selectTrainPanel, gbc_selectTrainPanel);
+		GridBagLayout gbl_selectTrainPanel = new GridBagLayout();
+		gbl_selectTrainPanel.columnWidths = new int[]{977, 0};
+		gbl_selectTrainPanel.rowHeights = new int[]{35, 20, 26, 414, 0};
+		gbl_selectTrainPanel.columnWeights = new double[]{0.0, Double.MIN_VALUE};
+		gbl_selectTrainPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+		selectTrainPanel.setLayout(gbl_selectTrainPanel);
+		selectTrainPanel.setBorder(titled);
 		
 		JPanel datePanel = new JPanel();
 		GridBagConstraints gbc_datePanel = new GridBagConstraints();
@@ -165,7 +165,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		gbc_datePanel.insets = new Insets(0, 0, 5, 0);
 		gbc_datePanel.gridx = 0;
 		gbc_datePanel.gridy = 0;
-		trainListPanel.add(datePanel, gbc_datePanel);
+		selectTrainPanel.add(datePanel, gbc_datePanel);
 		GridBagLayout gbl_datePanel = new GridBagLayout();
 		gbl_datePanel.columnWidths = new int[]{364, 73, 92, 73, 0};
 		gbl_datePanel.rowHeights = new int[]{23, 0};
@@ -203,7 +203,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		gbc_trainCategoryBox.insets = new Insets(0, 0, 5, 0);
 		gbc_trainCategoryBox.gridx = 0;
 		gbc_trainCategoryBox.gridy = 1;
-		trainListPanel.add(trainCategoryBox, gbc_trainCategoryBox);
+		selectTrainPanel.add(trainCategoryBox, gbc_trainCategoryBox);
 		
 		JPanel subTitlePanel = new JPanel();
 		GridBagConstraints gbc_subTitlePanel = new GridBagConstraints();
@@ -211,7 +211,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		gbc_subTitlePanel.insets = new Insets(0, 0, 5, 0);
 		gbc_subTitlePanel.gridx = 0;
 		gbc_subTitlePanel.gridy = 2;
-		trainListPanel.add(subTitlePanel, gbc_subTitlePanel);
+		selectTrainPanel.add(subTitlePanel, gbc_subTitlePanel);
 		GridBagLayout gbl_subTitlePanel = new GridBagLayout();
 		gbl_subTitlePanel.columnWidths = new int[]{200, 50, 200, 50, 200, 50, 200, 0};
 		gbl_subTitlePanel.rowHeights = new int[]{15, 0};
@@ -258,14 +258,19 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		gbc_subTitlePrice.gridy = 0;
 		subTitlePanel.add(subTitlePrice, gbc_subTitlePrice);
 		
-		trainInfomationsPanel = new JPanel();
-		JScrollPane trainListScrollPane = new JScrollPane(trainInfomationsPanel);
-		trainInfomationsPanel.setLayout(new GridLayout(0, 1, 0, 0));
+		trainListPanel = new JPanel();
+		JScrollPane trainListScrollPane = new JScrollPane(trainListPanel);
+		GridBagLayout gbl_trainInfomationsPanel = new GridBagLayout();
+		gbl_trainInfomationsPanel.columnWidths = new int[]{0};
+		gbl_trainInfomationsPanel.rowHeights = new int[]{0};
+		gbl_trainInfomationsPanel.columnWeights = new double[]{Double.MIN_VALUE};
+		gbl_trainInfomationsPanel.rowWeights = new double[]{Double.MIN_VALUE};
+		trainListPanel.setLayout(gbl_trainInfomationsPanel);
 		GridBagConstraints gbc_trainListScrollPane = new GridBagConstraints();
 		gbc_trainListScrollPane.fill = GridBagConstraints.BOTH;
 		gbc_trainListScrollPane.gridx = 0;
 		gbc_trainListScrollPane.gridy = 3;
-		trainListPanel.add(trainListScrollPane, gbc_trainListScrollPane);
+		selectTrainPanel.add(trainListScrollPane, gbc_trainListScrollPane);
 		trainListScrollPane.getVerticalScrollBar().setUnitIncrement(16);
 		
 		JPanel selectSeatPanel = new JPanel();
@@ -407,7 +412,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		trainCategoryBox.addActionListener(this);
 		
 		refLayeredPane = layeredPane;
-		refTrainList = trainListPanel;
+		refTrainList = selectTrainPanel;
 		setLocation(ScreenUtil.getCenterPosition(this));
 	}
 	
@@ -423,7 +428,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		refDepStation.setText(trainList.get(0).getDepPlace());
 		refArrStation.setText(trainList.get(0).getArrPlace());
 		
-		initScrollPane(list, "모두");
+		updateTrainList(list, "모두");
 		
 		System.out.println("인원 : " + personnel);
 		seatList = new ArrayList<Integer>(personnel);
@@ -489,7 +494,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		else if(e.getSource() instanceof JComboBox)
 		{
 			String type = ((JComboBox<String>)e.getSource()).getSelectedItem().toString();
-			initScrollPane(new ArrayList<TrainVo>(trainList), type);
+			updateTrainList(new ArrayList<TrainVo>(trainList), type);
 		}
 		else 
 		{
@@ -513,24 +518,46 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		}
 	}
 	
-	private void initScrollPane(ArrayList<TrainVo> list, String type) {
-		trainInfomationsPanel.removeAll();
+	private void updateTrainList(ArrayList<TrainVo> list, String type) {
+		trainListPanel.removeAll();
 		System.out.println("모든 열차 정보 수 : " + trainList.size());
 		int cnt = 0;
 		for(TrainVo vo : list) {
-			//========
-			//시간이 지난 열차 출력 X
-			//========
 			if(type.equals(vo.getTrainName()) || type.equals("모두")) {
 				TrainInformationPanel ti = new TrainInformationPanel(vo, this);
 				if(!ti.hasEmptySeat(personnel)) {
 					ti.setEnabled(false);
 				}
-				trainInfomationsPanel.add(ti);
+				
+				GridBagConstraints gbc_panel = new GridBagConstraints();
+				gbc_panel.insets = new Insets(0, 0, 3, 0);
+				
+				if(cnt >= list.size() - 1) {
+					gbc_panel.anchor = GridBagConstraints.NORTH;
+					gbc_panel.fill = GridBagConstraints.HORIZONTAL;
+				}
+				else {
+					gbc_panel.fill = GridBagConstraints.BOTH;
+				}
+				
+				gbc_panel.gridx = 0;
+				gbc_panel.gridy = cnt;
+				
+				trainListPanel.add(ti, gbc_panel);
 				cnt++;
 			}
 		}
-		trainInfomationsPanel.updateUI();
+		
+		double[] newRowWeights = new double[trainListPanel.getComponentCount()];
+		for(int j = 0; j < newRowWeights.length; j++) {
+			if(j < newRowWeights.length - 1)
+				newRowWeights[j] = 0.0;
+			else
+				newRowWeights[j] = 1.0;
+		}
+		((GridBagLayout)trainListPanel.getLayout()).rowWeights = newRowWeights;
+		
+		trainListPanel.updateUI();
 
 		System.out.println(type + " 열차 정보 수 : " + cnt);
 	}

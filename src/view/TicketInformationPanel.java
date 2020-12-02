@@ -143,7 +143,7 @@ public class TicketInformationPanel extends JPanel implements ActionListener{
 		else if(e.getSource() instanceof JMenuItem)
 		{
 			TrainDAO dao = TrainDAO.getInstance();
-			dao.deleteReservation(ticket);
+			dao.deleteReservation(ticket.getTicket_id());
 			((MainMenu)parent).UpdateTicketList();
 			new NoticeDialog("티켓이 취소되었습니다.", parent);
 		}

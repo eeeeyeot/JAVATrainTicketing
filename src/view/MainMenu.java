@@ -681,30 +681,28 @@ public class MainMenu extends JFrame {
 		ticketConfirmLabel.setFont(new Font("맑은 고딕", Font.BOLD, 25));
 		ticketingTabbedPane.add(ticketConfrimPanel);
 		ticketingTabbedPane.setTabComponentAt(2, ticketConfirmLabel);
-		GridBagLayout gbl_ticketConfrimPanel = new GridBagLayout();
-		gbl_ticketConfrimPanel.columnWidths = new int[]{802, 0};
-		gbl_ticketConfrimPanel.rowHeights = new int[]{2, 0};
-		gbl_ticketConfrimPanel.columnWeights = new double[]{1.0, Double.MIN_VALUE};
-		gbl_ticketConfrimPanel.rowWeights = new double[]{1.0, Double.MIN_VALUE};
-		ticketConfrimPanel.setLayout(gbl_ticketConfrimPanel);
 		
 		ticketListPanel = new JPanel();
 		JScrollPane ticketConfirmScrollPane = new JScrollPane(ticketListPanel);
-		GridBagLayout gbl_ticketListPanel = new GridBagLayout();
-		gbl_ticketListPanel.columnWidths = new int[]{805, 0};
-		gbl_ticketListPanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
-		gbl_ticketListPanel.columnWeights = new double[]{1.0, Double.MIN_VALUE};
-		gbl_ticketListPanel.rowWeights = new double[]{1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, Double.MIN_VALUE};
-		ticketListPanel.setLayout(gbl_ticketListPanel);
 		ticketListPanel.setBackground(new Color(0x77, 0x88, 0x99));
+		GridBagLayout gbl_ticketListPanel = new GridBagLayout();
+		
+		gbl_ticketListPanel.columnWidths = new int[]{0, 0};
+		gbl_ticketListPanel.rowHeights = new int[]{0, 0};
+		gbl_ticketListPanel.columnWeights = new double[]{1.0, Double.MIN_VALUE};
+		gbl_ticketListPanel.rowWeights = new double[]{0.0, 1.0};
+		ticketListPanel.setLayout(gbl_ticketListPanel);
+		
 		ticketConfirmScrollPane.getVerticalScrollBar().setUnitIncrement(16);
 		ticketConfirmScrollPane.getHorizontalScrollBar().setUnitIncrement(16);
+		ticketConfirmScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		
 		GridBagConstraints gbc_ticketConfirmScrollPane = new GridBagConstraints();
 		gbc_ticketConfirmScrollPane.fill = GridBagConstraints.BOTH;
 		gbc_ticketConfirmScrollPane.gridx = 0;
 		gbc_ticketConfirmScrollPane.gridy = 0;
-		ticketConfrimPanel.add(ticketConfirmScrollPane, gbc_ticketConfirmScrollPane);
+		ticketConfrimPanel.setLayout(new GridLayout(0, 1, 0, 0));
+		ticketConfrimPanel.add(ticketConfirmScrollPane);
 		// #####################################################
 		
 		logoutButton.addActionListener(new ActionListener() {
@@ -747,22 +745,35 @@ public class MainMenu extends JFrame {
 				}
 			});
 			
+			int cnt = 0;
 			for(int i = 0; i < tickets.size(); i++) {
+				GridBagConstraints gbc_panel = new GridBagConstraints();
+				gbc_panel.insets = new Insets(0, 0, 3, 0);
 				
-				String today = Constants.getTodayDateToString();
-				if(today.compareTo(tickets.get(i).getArrpland_time()) > 0) {
-					dao.deleteReservation(tickets.get(i));
-					tickets.remove(i);
-					continue;
+				if(i >= tickets.size() - 1) {
+					gbc_panel.anchor = GridBagConstraints.NORTH;
+					gbc_panel.fill = GridBagConstraints.HORIZONTAL;
+				}
+				else {
+					gbc_panel.fill = GridBagConstraints.BOTH;
 				}
 				
-				GridBagConstraints gbc_panel = new GridBagConstraints();
-				gbc_panel.insets = new Insets(0, 0, 5, 0);
-				gbc_panel.fill = GridBagConstraints.BOTH;
 				gbc_panel.gridx = 0;
-				gbc_panel.gridy = i;
+				gbc_panel.gridy = cnt;
+				
 				ticketListPanel.add(new TicketInformationPanel(tickets.get(i), this), gbc_panel);
+				
+				cnt++;
 			}
+			
+			double[] newRowWeights = new double[ticketListPanel.getComponentCount()];
+			for(int j = 0; j < newRowWeights.length; j++) {
+				if(j < newRowWeights.length - 1)
+					newRowWeights[j] = 0.0;
+				else
+					newRowWeights[j] = 1.0;
+			}
+			((GridBagLayout)ticketListPanel.getLayout()).rowWeights = newRowWeights;
 		}
 		ticketListPanel.updateUI();
 	}

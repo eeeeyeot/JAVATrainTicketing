@@ -21,9 +21,9 @@ import javax.swing.JPanel;
 @SuppressWarnings("serial")
 public class NoticeDialog extends JDialog {
 
-	NoticeDialog(String info, Component parent) {
+	public NoticeDialog(String info, Component parent) {
 		super((Frame) parent, "알림", true);
-		setSize(200, 120);
+		setSize(250, 150);
 		setLocation(ScreenUtil.getCurrentCenter((Window)parent, this));
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.setColumns(1);
@@ -34,6 +34,7 @@ public class NoticeDialog extends JDialog {
 
 		JLabel msg = new JLabel(info, JLabel.CENTER);
 		msg.setFont(font);
+		msg.validate();
 		getContentPane().add(msg);
 		
 		JButton ok = new JButton("확인");

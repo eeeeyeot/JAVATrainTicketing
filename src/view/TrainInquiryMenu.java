@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -35,18 +37,22 @@ import database.TrainDAO;
 import openAPI.TrainAPI;
 import openAPI.TrainVo;
 import util.ScreenUtil;
+import view_component.TrainInformationPanel;
 
 import javax.swing.JLayeredPane;
 import java.awt.BorderLayout;
 
 @SuppressWarnings("serial")
 public class TrainInquiryMenu extends JFrame implements ActionListener{
-
+	private static final Color SKY_BLUE = new Color(51,153,255);
+	public static final int SHOW = 2;
+	public static final int HIDE = 0;
+	
 	private TrainDAO dao;
 	private TrainVo currentTrainVo;
 	
-	private static final Color SKY_BLUE = new Color(51,153,255);
 	private ArrayList<Integer> seatList;
+	private Queue<ArrayList<TrainVo>> commandQue;
 	private int personnel;
 	private JFrame parent;
 	
@@ -416,22 +422,33 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		setLocation(ScreenUtil.getCenterPosition(this));
 	}
 	
-	public TrainInquiryMenu(ArrayList<TrainVo> list, JFrame parent, int personnel) {
+	public TrainInquiryMenu(Queue<ArrayList<TrainVo>> commands, JFrame parent, int personnel) {
 		this();
 		this.parent = parent;
 		this.personnel = personnel;
 		
-		trainList = list;
+		System.out.println("first command size : " + commands.size());
+		
+		trainList = commands.poll();
 		dao = TrainDAO.getInstance();
 		
-		refPresentlyDate.setText(getDateString(trainList.get(0).getDepplandTime()));
-		refDepStation.setText(trainList.get(0).getDepPlace());
-		refArrStation.setText(trainList.get(0).getArrPlace());
+		initLabel();
 		
-		updateTrainList(list, "모두");
+		updateTrainList(trainList, "모두");
 		
 		System.out.println("인원 : " + personnel);
 		seatList = new ArrayList<Integer>(personnel);
+		
+		commandQue = new LinkedList<ArrayList<TrainVo>>();
+		for(int i = 0; i < commands.size(); i++) {
+			addCommand(commands.poll());
+		}
+		
+		System.out.println("remain command length : " + commandQue.size());
+	}
+	
+	public void addCommand(ArrayList<TrainVo> command) {
+		commandQue.add(command);
 	}
 	
 	public void setLayer(int layer) {
@@ -459,12 +476,9 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 			//좌석 선택 화면일 때
 			else if(e.getActionCommand().contains("뒤로") && (refLayeredPane.getComponentCountInLayer(0) > 0))
 			{
-				refLayeredPane.setLayer(refTrainList, 2);
+				refLayeredPane.setLayer(refTrainList, SHOW);
 				
-				for(JButton b : seatButtons) {
-					b.setBackground(SKY_BLUE);
-					b.setEnabled(true);
-				}
+				clearSeats();
 			}
 			//열차 선택 화면일 때
 			else if(e.getActionCommand().contains("뒤로") && (refLayeredPane.getComponentCountInLayer(2) > 0)) 
@@ -502,7 +516,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		}
 	}
 	
-	public void initSeatButton(TrainVo vo) {
+	public void updateSeatButton(TrainVo vo) {
 		ArrayList<String> seats = dao.getSeatList(vo);
 		if(seats == null) return;
 		
@@ -598,11 +612,22 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 			}
 		});
 		
+		JFrame thisFrame = this;
+		
 		confirm.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if(hasOverlapSeat(dao.getSeatList(currentTrainVo), seatList)) {
+					new NoticeDialog("<html><center>이미 예매 완료된 좌석이 있습니다.</center><center>다시 선택해주세요.</center></html>", thisFrame);
+					clearSeats();
+					updateSeatButton(currentTrainVo);
+					jd.dispose();
+					return;
+				}
+				
 				if(type == 0) {
 					int emptyCount = dao.getEmptySeatCount(currentTrainVo) - seatList.size();
 					int remainPersonnel = personnel - seatList.size();
+					
 					if(emptyCount < remainPersonnel) 
 					{
 						setRandomSeat(emptyCount);
@@ -619,6 +644,17 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		});
 		
 		jd.setVisible(true);
+	}
+	
+	private boolean hasOverlapSeat(ArrayList<String> dbSeats, ArrayList<Integer> seat) {
+		for(Integer i : seat) {
+			for(String s : dbSeats) {
+				if(i == Integer.parseInt(s))
+					return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	private void subDialog(String msg) {
@@ -660,13 +696,38 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		ticket.setPrice(tmpPrice);
 		ticket.setTicketing_day(Constants.getTodayTimeToString());
 		ticket.setTicket_type(Constants.ONE_WAY);
-		
 		dao.insertTicketData(ticket);
 		
-		parent.setVisible(true);
-		dispose();
+		ArrayList<TrainVo> newList = commandQue.poll();
+		if(newList == null) {
+			System.out.println("dispose");
+			parent.setVisible(true);
+			dispose();
+		}
+		else {
+			trainList = newList;
+			updateTrainList(trainList, "모두");
+			setLayer(SHOW);
+			initLabel();
+			clearSeats();
+		}
 	}
-
+	
+	private void clearSeats() {
+		for(JButton b : seatButtons) {
+			b.setBackground(SKY_BLUE);
+			b.setEnabled(true);
+		}
+		
+		seatList.clear();
+	}
+	
+	private void initLabel() {
+		refPresentlyDate.setText(getDateString(trainList.get(0).getDepplandTime()));
+		refDepStation.setText(trainList.get(0).getDepPlace());
+		refArrStation.setText(trainList.get(0).getArrPlace());
+	}
+	
 	private String getSeatString() {
 		StringBuilder sb = new StringBuilder();
 		
@@ -684,7 +745,6 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		
 		return sb.toString().trim();
 	}
-	
 	
 	public void setCurrentTrainVo(TrainVo currentTrainVo) {
 		this.currentTrainVo = currentTrainVo;

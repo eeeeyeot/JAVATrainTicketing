@@ -1,4 +1,4 @@
-package view;
+package view_component;
 
 import javax.swing.JPanel;
 import java.awt.GridLayout;
@@ -20,6 +20,7 @@ import javax.swing.border.TitledBorder;
 
 import database.TrainDAO;
 import openAPI.*;
+import view.TrainInquiryMenu;
 
 @SuppressWarnings("serial")
 public class TrainInformationPanel extends JPanel implements ActionListener{
@@ -107,9 +108,9 @@ public class TrainInformationPanel extends JPanel implements ActionListener{
 	
 	public void actionPerformed(ActionEvent e) {
 		//선택된 TrainVo를 가져와야함
-		parent.setLayer(0);
+		parent.setLayer(TrainInquiryMenu.HIDE);
 		parent.setCurrentTrainVo(vo);
-		parent.initSeatButton(vo);
+		parent.updateSeatButton(vo);
 	}
 	
 	public boolean hasEmptySeat(int personnel) {

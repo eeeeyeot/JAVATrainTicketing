@@ -1,4 +1,4 @@
-package view;
+package view_component;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -23,7 +23,7 @@ public class AutoSuggestPanel extends JPanel{
 	private JComboBox<String> combo;
 	private Vector<String> v;
 	
-	AutoSuggestPanel(){
+	public AutoSuggestPanel(){
 		v = TrainAPI.getInstance().getStationNames();
 		setLayout(new GridBagLayout());
 		Font font = new Font("맑은 고딕", Font.BOLD, 12); 

@@ -1,7 +1,10 @@
 package constants;
 
+import java.awt.event.KeyEvent;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+
+import javax.swing.JTextField;
 
 public class Constants {
 	public static final String ONE_WAY = "10";
@@ -46,5 +49,18 @@ public class Constants {
 		cal = Calendar.getInstance();
 		
 		return sb.toString();
+	}
+	
+	public static void numberFormatLimit(KeyEvent e, int limit) {
+		char c = e.getKeyChar();
+		if (!Character.isDigit(c)) {
+			e.consume();
+			return;
+		}
+
+		if (((JTextField) e.getSource()).getText().length() > limit - 1) {
+			e.consume();
+			return;
+		}
 	}
 }

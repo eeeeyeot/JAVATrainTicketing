@@ -110,7 +110,7 @@ public class TrainDAO
 		
 		try {
 			String sql = "SELECT t.TICKET_ID, t.DEPPLAND_PLACE, t.ARRPLAND_PLACE, t.TRAIN_NAME, t.CAR_NUMBER, t.SEAT, t.PERSONNEL, " + 
-					"t.DEPPLAND_TIME, t.ARRPLAND_TIME, t.PRICE, t.TICKETING_DAY, t.TICKET_TYPE, t.TERM, t.EFFECTIVE_DATE, t.EXPIRATION_DATE " + 
+					"t.DEPPLAND_TIME, t.ARRPLAND_TIME, t.PRICE, t.TICKETING_DAY " + 
 					"FROM TICKET t, RESERVATION r " + 
 					"WHERE r.USER_ID = '" + userId + "' AND r.TICKET_ID = t.TICKET_ID";
 			
@@ -136,10 +136,6 @@ public class TrainDAO
 				vo.setArrpland_time(getDateToString(rs.getString("ARRPLAND_TIME")));
 				vo.setPrice(rs.getString("PRICE"));
 				vo.setTicketing_day(getDateToString(rs.getString("TICKETING_DAY")));
-				vo.setTicket_type(rs.getString("TICKET_TYPE"));
-				vo.setTerm(rs.getString("TERM"));
-				vo.setEffective_date(getDateToString(rs.getString("EFFECTIVE_DATE")));
-				vo.setExpiration_date(getDateToString(rs.getString("EXPIRATION_DATE")));
 				
 				list.add(vo);
 			}
@@ -216,8 +212,7 @@ public class TrainDAO
 			String sql = "insert into ticket values (" + vo.getTicket_id() + ", '" + vo.getDeppland_place() + "', '" 
 					+ vo.getArrpland_place() + "', '" + vo.getTrain_name() + "', " + vo.getCar_number() + ", '" + vo.getSeat() 
 					+ "', " + vo.getPersonnel() + ", "+ vo.getDepTimeDB() + ", "
-					+ vo.getArrTimeDB() + ", " + vo.getPrice() + ", " + vo.getTicketingDayDB() + ", " + vo.getTicket_type() 
-					+ ", " + vo.getTerm() + ", " + vo.getEffective_date() + ", " + vo.getExpiration_date() + ")";
+					+ vo.getArrTimeDB() + ", " + vo.getPrice() + ", " + vo.getTicketingDayDB() + ")";
 			System.out.println(sql);
 			rs = stmt.executeQuery(sql);
 		}

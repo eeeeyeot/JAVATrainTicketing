@@ -54,6 +54,10 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 	private ArrayList<Integer> seatList;
 	private Queue<ArrayList<TrainVo>> commandQue;
 	private int personnel;
+	private int childCharge;
+	private int adultCharge;
+	private int seniorCharge;
+	
 	private JFrame parent;
 	
 	private JPanel contentPane;
@@ -447,6 +451,23 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		System.out.println("remain command length : " + commandQue.size());
 	}
 	
+	public TrainInquiryMenu setPersonnel(int personnel) {
+		this.personnel = personnel;
+		return this;
+	}
+	public TrainInquiryMenu setChildCount(int childCount) {
+		this.childCharge = childCount * currentTrainVo.get;
+		return this;
+	}
+	public TrainInquiryMenu setAdultCount(int personnel) {
+		this.personnel = personnel;
+		return this;
+	}
+	public TrainInquiryMenu setSeniorCount(int personnel) {
+		this.personnel = personnel;
+		return this;
+	}
+	
 	public void addCommand(ArrayList<TrainVo> command) {
 		commandQue.add(command);
 	}
@@ -695,7 +716,6 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		String tmpPrice = "1000";
 		ticket.setPrice(tmpPrice);
 		ticket.setTicketing_day(Constants.getTodayTimeToString());
-		ticket.setTicket_type(Constants.ONE_WAY);
 		dao.insertTicketData(ticket);
 		
 		ArrayList<TrainVo> newList = commandQue.poll();

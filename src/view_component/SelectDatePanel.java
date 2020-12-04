@@ -24,6 +24,8 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import constants.Constants;
+import java.awt.GridLayout;
+import java.awt.BorderLayout;
 
 @SuppressWarnings("serial")
 public class SelectDatePanel extends JPanel {
@@ -48,11 +50,12 @@ public class SelectDatePanel extends JPanel {
 		
 		TitledBorder titled = new TitledBorder(new LineBorder(Color.LIGHT_GRAY, 2));
 		setBorder(titled);
+		setLayout(new BorderLayout(0, 0));
 		
 		JLabel dateLabel = new JLabel(title);
 		dateLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		dateLabel.setFont(new Font("굴림", Font.PLAIN, 18));
-		add(dateLabel);
+		dateLabel.setFont(new Font("나눔스퀘어", Font.PLAIN, 20));
+		add(dateLabel, BorderLayout.NORTH);
 
 		JPanel detailDatePanel = new JPanel();
 		add(detailDatePanel);
@@ -61,7 +64,7 @@ public class SelectDatePanel extends JPanel {
 		JPanel yearSelectPanel = new JPanel();
 		detailDatePanel.add(yearSelectPanel);
 		GridBagLayout gbl_yearSelectPanel = new GridBagLayout();
-		gbl_yearSelectPanel.columnWidths = new int[] { 30, 39, 105, 39, 30, 0 };
+		gbl_yearSelectPanel.columnWidths = new int[] {30, 39, 80, 39, 30, 0};
 		gbl_yearSelectPanel.rowHeights = new int[] { 40, 0 };
 		gbl_yearSelectPanel.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		gbl_yearSelectPanel.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
@@ -102,7 +105,7 @@ public class SelectDatePanel extends JPanel {
 		JPanel monthSelectPanel = new JPanel();
 		detailDatePanel.add(monthSelectPanel);
 		GridBagLayout gbl_monthSelectPanel = new GridBagLayout();
-		gbl_monthSelectPanel.columnWidths = new int[] { 30, 39, 105, 39, 30, 0 };
+		gbl_monthSelectPanel.columnWidths = new int[] {30, 39, 80, 39, 30, 0};
 		gbl_monthSelectPanel.rowHeights = new int[] { 40, 0 };
 		gbl_monthSelectPanel.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		gbl_monthSelectPanel.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
@@ -142,7 +145,7 @@ public class SelectDatePanel extends JPanel {
 		JPanel daySelectPanel = new JPanel();
 		detailDatePanel.add(daySelectPanel);
 		GridBagLayout gbl_daySelectPanel = new GridBagLayout();
-		gbl_daySelectPanel.columnWidths = new int[] { 30, 39, 105, 39, 30, 0 };
+		gbl_daySelectPanel.columnWidths = new int[] {30, 39, 80, 39, 30, 0};
 		gbl_daySelectPanel.rowHeights = new int[] { 40, 0 };
 		gbl_daySelectPanel.columnWeights = new double[] { 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE };
 		gbl_daySelectPanel.rowWeights = new double[] { 0.0, Double.MIN_VALUE };

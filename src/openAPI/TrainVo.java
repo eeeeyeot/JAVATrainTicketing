@@ -13,6 +13,8 @@ public class TrainVo
 	private String depPlace;
 	private String arrPlace;
 	
+	private int fee;
+	
 	public TrainVo() {}
 	public TrainVo(String trainName, String trainNo, String depplandTime, String arrplandTime, String depPlace, String arrPlace) {
 		this.trainName = trainName;
@@ -63,4 +65,7 @@ public class TrainVo
 	
 	public String getArrPlace() { return arrPlace; }
 	public void setArrPlace(String arrPlace) { this.arrPlace = arrPlace; }
+	
+	public int getFee() { return fee; }
+	public void setFee(int fee) { this.fee = fee; }
 }

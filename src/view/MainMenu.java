@@ -13,12 +13,10 @@ import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Comparator;
-import java.util.Date;
+import java.util.LinkedList;
+import java.util.Queue;
 
 //import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -29,6 +27,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -39,6 +39,10 @@ import database.UserVo;
 import openAPI.TrainAPI;
 import openAPI.TrainVo;
 import util.ScreenUtil;
+import view_component.AutoSuggestPanel;
+import view_component.SelectDatePanel;
+import view_component.TicketInformationPanel;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -48,16 +52,27 @@ import javax.swing.JScrollPane;
 
 @SuppressWarnings("serial")
 public class MainMenu extends JFrame {
+	@SuppressWarnings("unused")
+	private static final int SEASON_PERSONNEL = 1;
 	
 	private TrainDAO dao;
 	private UserVo userVo;
+	
 	private Window parent;
 	private JPanel ticketListPanel;
+	private JPanel reservTicketPanel;
 	private JLabel welcomeLabel;
+	JTabbedPane reservTicketTabbedPane;
 	
-	private int personnel = 0;
+	private AutoSuggestPanel depComboBox;
+	private AutoSuggestPanel arrComboBox;
+	private SelectDatePanel selectComingDayPanel = null;
+	
+	private int oneway_personnel = 0;
+	private int round_personnel = 0;
 	
 	private JPanel contentPane;
+	private JPanel roundTripPanel;
 	
 	public MainMenu() {
 		setTitle("기차 예매 프로그램");
@@ -132,8 +147,7 @@ public class MainMenu extends JFrame {
 		ticketingTabbedPane.setBounds(0, 0, 974, 530);
 		centerPanel.add(ticketingTabbedPane);
 
-		// #####################################################
-		JPanel reservTicketPanel = new JPanel();
+		reservTicketPanel = new JPanel();
 		JLabel reservTicketLabel = new JLabel("<html>승차권 예매</html>");
 		reservTicketLabel.setFont(new Font("맑은 고딕", Font.BOLD, 25));
 		ticketingTabbedPane.add(reservTicketPanel);
@@ -141,7 +155,7 @@ public class MainMenu extends JFrame {
 		ticketingTabbedPane.setTabComponentAt(0, reservTicketLabel);
 		reservTicketPanel.setLayout(new BorderLayout(0, 0));
 
-		JTabbedPane reservTicketTabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		reservTicketTabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		reservTicketPanel.add(reservTicketTabbedPane);
 
 		JPanel onewayPanel = new JPanel();
@@ -149,527 +163,29 @@ public class MainMenu extends JFrame {
 		onewayLabel.setFont(new Font("맑은 고딕", Font.BOLD, 20));
 		onewayLabel.setPreferredSize(new Dimension(380, 30));
 		reservTicketTabbedPane.add(onewayPanel);
-		// reservTicketTabbedPane.setTitleAt(0, "편도");
 		reservTicketTabbedPane.setTabComponentAt(0, onewayLabel);
 		GridBagLayout gbl_onewayPanel = new GridBagLayout();
 		gbl_onewayPanel.columnWidths = new int[] { 823, 0 };
-		gbl_onewayPanel.rowHeights = new int[] { 90, 90, 90, 90, 0, 0 };
+		gbl_onewayPanel.rowHeights = new int[] { 90, 90, 90, 0, 0 };
 		gbl_onewayPanel.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-		gbl_onewayPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		gbl_onewayPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		onewayPanel.setLayout(gbl_onewayPanel);
-
-		JPanel selectStationPanel = new JPanel();
-		GridBagConstraints gbc_selectStationPanel = new GridBagConstraints();
-		gbc_selectStationPanel.fill = GridBagConstraints.BOTH;
-		gbc_selectStationPanel.insets = new Insets(0, 0, 5, 0);
-		gbc_selectStationPanel.gridx = 0;
-		gbc_selectStationPanel.gridy = 0;
-		onewayPanel.add(selectStationPanel, gbc_selectStationPanel);
-		selectStationPanel.setLayout(new GridLayout(0, 2, 0, 0));
-
-		JPanel departurePanel = new JPanel();
-		selectStationPanel.add(departurePanel);
-		departurePanel.setLayout(new GridLayout(0, 1, 0, 0));
-
-		JLabel depPlaceLabel = new JLabel("출 발 역");
-		depPlaceLabel.setFont(new Font("굴림", Font.PLAIN, 20));
-		depPlaceLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		departurePanel.add(depPlaceLabel);
-
-		AutoSuggestPanel depComboBox = new AutoSuggestPanel();
-		departurePanel.add(depComboBox);
-		GridBagLayout gbl_depComboBox = new GridBagLayout();
-		gbl_depComboBox.columnWidths = new int[] { 0 };
-		gbl_depComboBox.rowHeights = new int[] { 0 };
-		gbl_depComboBox.columnWeights = new double[] { Double.MIN_VALUE };
-		gbl_depComboBox.rowWeights = new double[] { Double.MIN_VALUE };
-		depComboBox.setLayout(gbl_depComboBox);
-
-		JPanel arrivePanel = new JPanel();
-		selectStationPanel.add(arrivePanel);
-		arrivePanel.setLayout(new GridLayout(2, 1, 0, 0));
-
-		JLabel arrPlaceLabel = new JLabel("도 착 역");
-		arrPlaceLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		arrPlaceLabel.setFont(new Font("굴림", Font.PLAIN, 20));
-		arrivePanel.add(arrPlaceLabel);
-		AutoSuggestPanel arrComboBox = new AutoSuggestPanel();
-		arrivePanel.add(arrComboBox);
-		GridBagLayout gbl_arrComboBox = new GridBagLayout();
-		gbl_arrComboBox.columnWidths = new int[] { 0 };
-		gbl_arrComboBox.rowHeights = new int[] { 0 };
-		gbl_arrComboBox.columnWeights = new double[] { Double.MIN_VALUE };
-		gbl_arrComboBox.rowWeights = new double[] { Double.MIN_VALUE };
-		arrComboBox.setLayout(gbl_arrComboBox);
+		onewayPanel.setBackground(new Color(0x77, 0x88, 0x99));
 		
-		depComboBox.setDefault("서울");
-		arrComboBox.setDefault("대전");
-
-		JPanel selectDepDatePanel = new JPanel();
-		GridBagConstraints gbc_selectDepDatePanel = new GridBagConstraints();
-		gbc_selectDepDatePanel.fill = GridBagConstraints.VERTICAL;
-		gbc_selectDepDatePanel.insets = new Insets(0, 0, 5, 0);
-		gbc_selectDepDatePanel.gridx = 0;
-		gbc_selectDepDatePanel.gridy = 1;
-		onewayPanel.add(selectDepDatePanel, gbc_selectDepDatePanel);
-		selectDepDatePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-
-		JLabel depDateLabel = new JLabel("출 발 일");
-		depDateLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		depDateLabel.setFont(new Font("굴림", Font.PLAIN, 21));
-		selectDepDatePanel.add(depDateLabel);
-
-		JPanel detailDatePanel = new JPanel();
-		selectDepDatePanel.add(detailDatePanel);
-		detailDatePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-
-		JPanel yearSelectPanel = new JPanel();
-		detailDatePanel.add(yearSelectPanel);
-		GridBagLayout gbl_yearSelectPanel = new GridBagLayout();
-		gbl_yearSelectPanel.columnWidths = new int[] { 30, 39, 105, 39, 30, 0 };
-		gbl_yearSelectPanel.rowHeights = new int[] { 40, 0 };
-		gbl_yearSelectPanel.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
-		gbl_yearSelectPanel.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
-		yearSelectPanel.setLayout(gbl_yearSelectPanel);
-
-		JButton decreaseYearButton = new JButton("-");
-
-		GridBagConstraints gbc_decreaseYearButton = new GridBagConstraints();
-		gbc_decreaseYearButton.fill = GridBagConstraints.HORIZONTAL;
-		gbc_decreaseYearButton.insets = new Insets(0, 0, 0, 5);
-		gbc_decreaseYearButton.gridx = 1;
-		gbc_decreaseYearButton.gridy = 0;
-		yearSelectPanel.add(decreaseYearButton, gbc_decreaseYearButton);
-
-		JTextField yearTextField = new JTextField();
-		yearTextField.setHorizontalAlignment(SwingConstants.CENTER);
-		GridBagConstraints gbc_TextField = new GridBagConstraints();
-		gbc_TextField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_TextField.insets = new Insets(0, 0, 0, 5);
-		gbc_TextField.gridx = 2;
-		gbc_TextField.gridy = 0;
-		yearSelectPanel.add(yearTextField, gbc_TextField);
-		yearTextField.addKeyListener(new KeyAdapter() {
-			public void keyTyped(KeyEvent e) {
-				numberFormatLimit(e, 4);
-			}
-		});
-
-		JButton increaseYearButton = new JButton("+");
-		GridBagConstraints gbc_increaseYearButton = new GridBagConstraints();
-		gbc_increaseYearButton.insets = new Insets(0, 0, 0, 5);
-		gbc_increaseYearButton.fill = GridBagConstraints.HORIZONTAL;
-		gbc_increaseYearButton.gridx = 3;
-		gbc_increaseYearButton.gridy = 0;
-		yearSelectPanel.add(increaseYearButton, gbc_increaseYearButton);
-
-		JLabel yearLabel = new JLabel("년");
-		GridBagConstraints gbc_yearLabel = new GridBagConstraints();
-		gbc_yearLabel.gridx = 4;
-		gbc_yearLabel.gridy = 0;
-		yearSelectPanel.add(yearLabel, gbc_yearLabel);
-
-		JPanel monthSelectPanel = new JPanel();
-		detailDatePanel.add(monthSelectPanel);
-		GridBagLayout gbl_monthSelectPanel = new GridBagLayout();
-		gbl_monthSelectPanel.columnWidths = new int[] { 30, 39, 105, 39, 30, 0 };
-		gbl_monthSelectPanel.rowHeights = new int[] { 40, 0 };
-		gbl_monthSelectPanel.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
-		gbl_monthSelectPanel.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
-		monthSelectPanel.setLayout(gbl_monthSelectPanel);
-
-		JButton decreaseMonthButton = new JButton("-");
-		GridBagConstraints gbc_decreaseMonthButton = new GridBagConstraints();
-		gbc_decreaseMonthButton.anchor = GridBagConstraints.WEST;
-		gbc_decreaseMonthButton.insets = new Insets(0, 0, 0, 5);
-		gbc_decreaseMonthButton.gridx = 1;
-		gbc_decreaseMonthButton.gridy = 0;
-		monthSelectPanel.add(decreaseMonthButton, gbc_decreaseMonthButton);
-
-		JTextField monthTextField = new JTextField();
-		monthTextField.setHorizontalAlignment(SwingConstants.CENTER);
-		GridBagConstraints gbc_TextField_1 = new GridBagConstraints();
-		gbc_TextField_1.fill = GridBagConstraints.HORIZONTAL;
-		gbc_TextField_1.insets = new Insets(0, 0, 0, 5);
-		gbc_TextField_1.gridx = 2;
-		gbc_TextField_1.gridy = 0;
-		monthSelectPanel.add(monthTextField, gbc_TextField_1);
-
-		JButton increaseMonthButton = new JButton("+");
-		GridBagConstraints gbc_increaseMonthButton = new GridBagConstraints();
-		gbc_increaseMonthButton.insets = new Insets(0, 0, 0, 5);
-		gbc_increaseMonthButton.anchor = GridBagConstraints.WEST;
-		gbc_increaseMonthButton.gridx = 3;
-		gbc_increaseMonthButton.gridy = 0;
-		monthSelectPanel.add(increaseMonthButton, gbc_increaseMonthButton);
-
-		JLabel monthLabel = new JLabel("월");
-		GridBagConstraints gbc_monthLabel = new GridBagConstraints();
-		gbc_monthLabel.gridx = 4;
-		gbc_monthLabel.gridy = 0;
-		monthSelectPanel.add(monthLabel, gbc_monthLabel);
-
-		JPanel daySelectPanel = new JPanel();
-		detailDatePanel.add(daySelectPanel);
-		GridBagLayout gbl_daySelectPanel = new GridBagLayout();
-		gbl_daySelectPanel.columnWidths = new int[] { 30, 39, 105, 39, 30, 0 };
-		gbl_daySelectPanel.rowHeights = new int[] { 40, 0 };
-		gbl_daySelectPanel.columnWeights = new double[] { 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE };
-		gbl_daySelectPanel.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
-		daySelectPanel.setLayout(gbl_daySelectPanel);
-
-		JButton decreaseDayButton = new JButton("-");
-		GridBagConstraints gbc_decreaseDayButton = new GridBagConstraints();
-		gbc_decreaseDayButton.anchor = GridBagConstraints.WEST;
-		gbc_decreaseDayButton.insets = new Insets(0, 0, 0, 5);
-		gbc_decreaseDayButton.gridx = 1;
-		gbc_decreaseDayButton.gridy = 0;
-		daySelectPanel.add(decreaseDayButton, gbc_decreaseDayButton);
-
-		JTextField dayTextField = new JTextField();
-		dayTextField.setHorizontalAlignment(SwingConstants.CENTER);
-		GridBagConstraints gbc_TextField_2 = new GridBagConstraints();
-		gbc_TextField_2.insets = new Insets(0, 0, 0, 5);
-		gbc_TextField_2.fill = GridBagConstraints.HORIZONTAL;
-		gbc_TextField_2.gridx = 2;
-		gbc_TextField_2.gridy = 0;
-		daySelectPanel.add(dayTextField, gbc_TextField_2);
-
-		monthTextField.addKeyListener(new KeyAdapter() {
-			public void keyTyped(KeyEvent e) {
-				numberFormatLimit(e, 2);
-			}
-
-			public void keyReleased(KeyEvent e) {
-				setValidValue((JTextField) e.getSource(), yearTextField.getText(), monthTextField.getText(), false);
-			}
-		});
-
-		dayTextField.addKeyListener(new KeyAdapter() {
-			public void keyTyped(KeyEvent e) {
-				numberFormatLimit(e, 2);
-			}
-
-			public void keyReleased(KeyEvent e) {
-				setValidValue((JTextField) e.getSource(), yearTextField.getText(), monthTextField.getText(), true);
-			}
-		});
-
-		initializeDate(yearTextField, monthTextField, dayTextField);
-
-		JButton increaseDayButton = new JButton("+");
-		GridBagConstraints gbc_increaseDayButton = new GridBagConstraints();
-		gbc_increaseDayButton.insets = new Insets(0, 0, 0, 5);
-		gbc_increaseDayButton.anchor = GridBagConstraints.WEST;
-		gbc_increaseDayButton.gridx = 3;
-		gbc_increaseDayButton.gridy = 0;
-		daySelectPanel.add(increaseDayButton, gbc_increaseDayButton);
-
-		decreaseDayButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				decreaseDate(dayTextField);
-			}
-		});
-		decreaseMonthButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				decreaseDate(monthTextField);
-			}
-		});
-		decreaseYearButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				decreaseDate(yearTextField);
-			}
-		});
-
-		increaseDayButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				increaseDate(dayTextField, yearTextField.getText(), monthTextField.getText(), true);
-			}
-		});
-		increaseMonthButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				increaseDate(monthTextField, yearTextField.getText(), monthTextField.getText(), false);
-			}
-		});
-		increaseYearButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				increaseDate(yearTextField, yearTextField.getText(), null, false);
-			}
-		});
-
-		JLabel lblNewLabel_1 = new JLabel("일");
-		GridBagConstraints gbc_lblNewLabel_1 = new GridBagConstraints();
-		gbc_lblNewLabel_1.gridx = 4;
-		gbc_lblNewLabel_1.gridy = 0;
-		daySelectPanel.add(lblNewLabel_1, gbc_lblNewLabel_1);
-
-		JPanel showHeadCntPanel = new JPanel();
-		GridBagConstraints gbc_showHeadCntPanel = new GridBagConstraints();
-		gbc_showHeadCntPanel.fill = GridBagConstraints.BOTH;
-		gbc_showHeadCntPanel.insets = new Insets(0, 0, 5, 0);
-		gbc_showHeadCntPanel.gridx = 0;
-		gbc_showHeadCntPanel.gridy = 2;
-		onewayPanel.add(showHeadCntPanel, gbc_showHeadCntPanel);
-
-		JPanel showCountDetailPanel = new JPanel();
-		showHeadCntPanel.add(showCountDetailPanel);
-		showCountDetailPanel.setLayout(new GridLayout(0, 1, 0, 0));
-
-		JLabel headCountPanel = new JLabel("승객 인원");
-		headCountPanel.setHorizontalAlignment(SwingConstants.CENTER);
-		headCountPanel.setFont(new Font("굴림", Font.PLAIN, 20));
-		showCountDetailPanel.add(headCountPanel);
-
-		JPanel countDetailFractionPanel = new JPanel();
-
-		showCountDetailPanel.add(countDetailFractionPanel);
-		GridBagLayout gbl_countDetailFractionPanel = new GridBagLayout();
-		gbl_countDetailFractionPanel.columnWidths = new int[] { 30, 160, 30, 160, 30, 160, 30, 0 };
-		gbl_countDetailFractionPanel.rowHeights = new int[] { 24, 0 };
-		gbl_countDetailFractionPanel.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-				Double.MIN_VALUE };
-		gbl_countDetailFractionPanel.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
-		countDetailFractionPanel.setLayout(gbl_countDetailFractionPanel);
-
-		JLabel childCountLabel = new JLabel("어린이 0명");
-		childCountLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		childCountLabel.setFont(new Font("굴림", Font.BOLD, 28));
-		GridBagConstraints gbc_childCountLabel = new GridBagConstraints();
-		gbc_childCountLabel.anchor = GridBagConstraints.NORTH;
-		gbc_childCountLabel.insets = new Insets(0, 0, 0, 5);
-		gbc_childCountLabel.gridx = 1;
-		gbc_childCountLabel.gridy = 0;
-		countDetailFractionPanel.add(childCountLabel, gbc_childCountLabel);
-
-		JLabel adultCountLabel = new JLabel("어른 0명");
-		adultCountLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		adultCountLabel.setFont(new Font("굴림", Font.BOLD, 28));
-		GridBagConstraints gbc_adultCountLabel = new GridBagConstraints();
-		gbc_adultCountLabel.anchor = GridBagConstraints.NORTH;
-		gbc_adultCountLabel.insets = new Insets(0, 0, 0, 5);
-		gbc_adultCountLabel.gridx = 3;
-		gbc_adultCountLabel.gridy = 0;
-		countDetailFractionPanel.add(adultCountLabel, gbc_adultCountLabel);
-
-		JLabel seniorCountLabel = new JLabel("경로 0명");
-		seniorCountLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		seniorCountLabel.setFont(new Font("굴림", Font.BOLD, 28));
-		GridBagConstraints gbc_seniorCountLabel = new GridBagConstraints();
-		gbc_seniorCountLabel.insets = new Insets(0, 0, 0, 5);
-		gbc_seniorCountLabel.anchor = GridBagConstraints.NORTH;
-		gbc_seniorCountLabel.gridx = 5;
-		gbc_seniorCountLabel.gridy = 0;
-		countDetailFractionPanel.add(seniorCountLabel, gbc_seniorCountLabel);
-
-		JPanel selectHeadCntPaenl = new JPanel();
-		GridBagConstraints gbc_selectHeadCntPaenl = new GridBagConstraints();
-		gbc_selectHeadCntPaenl.insets = new Insets(0, 0, 5, 0);
-		gbc_selectHeadCntPaenl.fill = GridBagConstraints.BOTH;
-		gbc_selectHeadCntPaenl.gridx = 0;
-		gbc_selectHeadCntPaenl.gridy = 3;
-		onewayPanel.add(selectHeadCntPaenl, gbc_selectHeadCntPaenl);
-		selectHeadCntPaenl.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-
-		JPanel selectDetailCountPanel = new JPanel();
-		selectHeadCntPaenl.add(selectDetailCountPanel);
-		selectDetailCountPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-
-		JPanel selectChildCountPanel = new JPanel();
-		selectDetailCountPanel.add(selectChildCountPanel);
-		selectChildCountPanel.setLayout(new GridLayout(0, 1, 0, 0));
-
-		JLabel selectChildLabel = new JLabel("어린이");
-		selectChildLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		selectChildLabel.setFont(new Font("굴림", Font.PLAIN, 20));
-		selectChildCountPanel.add(selectChildLabel);
-
-		JPanel selectChildCount = new JPanel();
-		selectChildCountPanel.add(selectChildCount);
-
-		JButton decreaseChildCntButton = new JButton("-");
-		selectChildCount.add(decreaseChildCntButton);
-
-		JTextField childCntTextField = new JTextField("0");
-		childCntTextField.setHorizontalAlignment(SwingConstants.CENTER);
-		childCntTextField.setColumns(10);
-		selectChildCount.add(childCntTextField);
-
-		decreaseChildCntButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				decreaseCount(childCntTextField);
-			}
-		});
-
-		childCntTextField.getDocument().addDocumentListener(new DocumentListener() {
-			public void insertUpdate(DocumentEvent e) {
-				childCountLabel.setText("어린이 " + childCntTextField.getText() + "명");
-			}
-
-			public void removeUpdate(DocumentEvent e) {
-			}
-
-			public void changedUpdate(DocumentEvent e) {
-			}
-		});
-		childCntTextField.addKeyListener(new KeyAdapter() {
-			public void keyTyped(KeyEvent e) {
-				numberFormatLimit(e, 1);
-
-			}
-
-			public void keyReleased(KeyEvent e) {
-				setNumberLimit((JTextField) e.getSource());
-			}
-		});
-
-		JButton increaseChildCntButton = new JButton("+");
-		selectChildCount.add(increaseChildCntButton);
-		increaseChildCntButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				increaseCount(childCntTextField);
-			}
-		});
-
-		JPanel selectAdultCountPanel = new JPanel();
-		selectDetailCountPanel.add(selectAdultCountPanel);
-		selectAdultCountPanel.setLayout(new GridLayout(0, 1, 0, 0));
-
-		JLabel selectAdultLabel = new JLabel("어른");
-		selectAdultLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		selectAdultLabel.setFont(new Font("굴림", Font.PLAIN, 20));
-		selectAdultCountPanel.add(selectAdultLabel);
-
-		JPanel selectAdultCount = new JPanel();
-		selectAdultCountPanel.add(selectAdultCount);
-
-		JButton decreaseAdultCntButton = new JButton("-");
-		selectAdultCount.add(decreaseAdultCntButton);
-
-		JTextField adultCntTextField = new JTextField("0");
-		adultCntTextField.setHorizontalAlignment(SwingConstants.CENTER);
-		adultCntTextField.setColumns(10);
-		selectAdultCount.add(adultCntTextField);
-
-		adultCntTextField.getDocument().addDocumentListener(new DocumentListener() {
-			public void insertUpdate(DocumentEvent e) {
-				adultCountLabel.setText("어른 " + adultCntTextField.getText() + "명");
-			}
-
-			public void removeUpdate(DocumentEvent e) {
-			}
-
-			public void changedUpdate(DocumentEvent e) {
-			}
-		});
-
-		adultCntTextField.addKeyListener(new KeyAdapter() {
-			public void keyTyped(KeyEvent e) {
-				numberFormatLimit(e, 1);
-			}
-		});
-
-		decreaseAdultCntButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				decreaseCount(adultCntTextField);
-			}
-		});
-
-		JButton increaseAdultCntButton = new JButton("+");
-		selectAdultCount.add(increaseAdultCntButton);
-		increaseAdultCntButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				increaseCount(adultCntTextField);
-			}
-		});
-
-		JPanel selectSeniorCountPanel = new JPanel();
-		selectDetailCountPanel.add(selectSeniorCountPanel);
-		selectSeniorCountPanel.setLayout(new GridLayout(0, 1, 0, 0));
-
-		JLabel selectSeniorLabel = new JLabel("경로");
-		selectSeniorLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		selectSeniorLabel.setFont(new Font("굴림", Font.PLAIN, 20));
-		selectSeniorCountPanel.add(selectSeniorLabel);
-
-		JPanel selectSeniorCount = new JPanel();
-		selectSeniorCountPanel.add(selectSeniorCount);
-
-		JButton decreaseSeniorCntButton = new JButton("-");
-		selectSeniorCount.add(decreaseSeniorCntButton);
-
-		JTextField seniorCntTextField = new JTextField("0");
-		seniorCntTextField.setHorizontalAlignment(SwingConstants.CENTER);
-		seniorCntTextField.setColumns(10);
-		selectSeniorCount.add(seniorCntTextField);
-
-		decreaseSeniorCntButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				decreaseCount(seniorCntTextField);
-			}
-		});
-		seniorCntTextField.getDocument().addDocumentListener(new DocumentListener() {
-			public void insertUpdate(DocumentEvent e) {
-				seniorCountLabel.setText("경로 " + seniorCntTextField.getText() + "명");
-			}
-
-			public void removeUpdate(DocumentEvent e) {
-			}
-
-			public void changedUpdate(DocumentEvent e) {
-			}
-		});
-
-		seniorCntTextField.addKeyListener(new KeyAdapter() {
-			public void keyTyped(KeyEvent e) {
-				numberFormatLimit(e, 1);
-			}
-		});
-
-		JButton increaseSeniorCntButton = new JButton("+");
-		selectSeniorCount.add(increaseSeniorCntButton);
-
-		increaseSeniorCntButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				increaseCount(seniorCntTextField);
-			}
-		});
-		
-		JPanel roundTripPanel = new JPanel();
+		roundTripPanel = new JPanel();
 		JLabel roundTripLabel = new JLabel("왕복");
 		roundTripLabel.setFont(new Font("맑은 고딕", Font.BOLD, 20));
 		roundTripLabel.setPreferredSize(new Dimension(380, 30));
 		reservTicketTabbedPane.add(roundTripPanel);
 		reservTicketTabbedPane.setTabComponentAt(1, roundTripLabel);
-
-		JFrame thisObj = this;
-		JButton trainInquiryButton = new JButton("열차 조회");
-		trainInquiryButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String selectedDate = yearTextField.getText() + monthTextField.getText() + dayTextField.getText();
-				
-				if(selectedDate.compareTo(Constants.getTodayDateToString()) < 0) {
-					showDialog("<html><center>선택한 날짜가</center><center>유효하지 않습니다.</center></html>");
-				}
-				else if(personnel > 0) { 
-					String depText = depComboBox.getComboBoxText();
-					String arrText = arrComboBox.getComboBoxText();
-					String date = yearTextField.getText() + String.format("%02d", Integer.parseInt(monthTextField.getText())) + String.format("%02d", Integer.parseInt(dayTextField.getText()));
-					ArrayList<TrainVo> list = TrainAPI.getInstance().getTrainList(depText, arrText, date);
-					new TrainInquiryMenu(list, thisObj, personnel).setVisible(true);
-					setVisible(false);
-				}else
-				{
-					String msg = "인원의 수가 0명입니다.";
-					showDialog(msg);
-				}
-			}
-		});
-		trainInquiryButton.setFont(new Font("맑은 고딕", Font.PLAIN, 24));
-		reservTicketPanel.add(trainInquiryButton, BorderLayout.SOUTH);
+		GridBagLayout gbl_roundTripPanel = new GridBagLayout();
+		gbl_roundTripPanel.columnWidths = new int[] { 823, 0 };
+		gbl_roundTripPanel.rowHeights = new int[] {90, 90, 90, 80, 30, 0};
+		gbl_roundTripPanel.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
+		gbl_roundTripPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		roundTripPanel.setLayout(gbl_roundTripPanel);
+		roundTripPanel.setBackground(new Color(0x77, 0x88, 0x99));
 		
-		// #####################################################
-
-		// #####################################################
 		JPanel seasonTicketPanel = new JPanel();
 		JLabel seasonTicketLabel = new JLabel("<html>정기권 예매</html>");
 		seasonTicketLabel.setFont(new Font("맑은 고딕", Font.BOLD, 25));
@@ -703,7 +219,6 @@ public class MainMenu extends JFrame {
 		gbc_ticketConfirmScrollPane.gridy = 0;
 		ticketConfrimPanel.setLayout(new GridLayout(0, 1, 0, 0));
 		ticketConfrimPanel.add(ticketConfirmScrollPane);
-		// #####################################################
 		
 		logoutButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -711,6 +226,12 @@ public class MainMenu extends JFrame {
 				dispose();
 			}
 		});
+		
+		initReservationPanel(onewayPanel);
+		initReservationPanel(roundTripPanel, "roundtrip");
+		initInquiryButton();
+		
+		
 		
 		setLocation(ScreenUtil.getCenterPosition(this));
 	}
@@ -778,98 +299,399 @@ public class MainMenu extends JFrame {
 		ticketListPanel.updateUI();
 	}
 	
+	private void initReservationPanel(JPanel target) {
+		initReservationPanel(target, "oneway");
+	}
+	
+	private void initReservationPanel(JPanel target, String type) {
+		int gridy = 0;
+		TitledBorder titled = new TitledBorder(new LineBorder(Color.LIGHT_GRAY, 2));
+		
+		JPanel selectStationPanel = new JPanel();
+		GridBagConstraints gbc_selectStationPanel = new GridBagConstraints();
+		gbc_selectStationPanel.fill = GridBagConstraints.BOTH;
+		gbc_selectStationPanel.insets = new Insets(0, 0, 5, 0);
+		gbc_selectStationPanel.gridx = 0;
+		gbc_selectStationPanel.gridy = gridy;
+		target.add(selectStationPanel, gbc_selectStationPanel);
+		selectStationPanel.setLayout(new GridLayout(0, 2, 0, 0));
+		gridy++;
+		
+		JPanel departurePanel = new JPanel();
+		selectStationPanel.add(departurePanel);
+		departurePanel.setLayout(new GridLayout(0, 1, 0, 0));
+		departurePanel.setBorder(titled);
+
+		JLabel depPlaceLabel = new JLabel("출 발 역");
+		depPlaceLabel.setFont(new Font("굴림", Font.PLAIN, 20));
+		depPlaceLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		departurePanel.add(depPlaceLabel);
+
+		depComboBox = new AutoSuggestPanel();
+		departurePanel.add(depComboBox);
+		GridBagLayout gbl_depComboBox = new GridBagLayout();
+		gbl_depComboBox.columnWidths = new int[] { 0 };
+		gbl_depComboBox.rowHeights = new int[] { 0 };
+		gbl_depComboBox.columnWeights = new double[] { Double.MIN_VALUE };
+		gbl_depComboBox.rowWeights = new double[] { Double.MIN_VALUE };
+		depComboBox.setLayout(gbl_depComboBox);
+
+		JPanel arrivePanel = new JPanel();
+		selectStationPanel.add(arrivePanel);
+		arrivePanel.setLayout(new GridLayout(2, 1, 0, 0));
+		arrivePanel.setBorder(titled);
+		
+		JLabel arrPlaceLabel = new JLabel("도 착 역");
+		arrPlaceLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		arrPlaceLabel.setFont(new Font("굴림", Font.PLAIN, 20));
+		arrivePanel.add(arrPlaceLabel);
+		arrComboBox = new AutoSuggestPanel();
+		arrivePanel.add(arrComboBox);
+		GridBagLayout gbl_arrComboBox = new GridBagLayout();
+		gbl_arrComboBox.columnWidths = new int[] { 0 };
+		gbl_arrComboBox.rowHeights = new int[] { 0 };
+		gbl_arrComboBox.columnWeights = new double[] { Double.MIN_VALUE };
+		gbl_arrComboBox.rowWeights = new double[] { Double.MIN_VALUE };
+		arrComboBox.setLayout(gbl_arrComboBox);
+		
+		depComboBox.setDefault("서울");
+		arrComboBox.setDefault("대전");
+		
+		SelectDatePanel selectDepDatePanel = new SelectDatePanel("oneway");
+		GridBagConstraints gbc_selectDepDatePanel = new GridBagConstraints();
+		gbc_selectDepDatePanel.fill = GridBagConstraints.VERTICAL;
+		gbc_selectDepDatePanel.insets = new Insets(0, 0, 5, 0);
+		gbc_selectDepDatePanel.gridx = 0;
+		gbc_selectDepDatePanel.gridy = gridy;
+		target.add(selectDepDatePanel, gbc_selectDepDatePanel);
+		selectDepDatePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		gridy++;
+		
+		if(type.equals("roundtrip")) {
+			//도착일 Panel 추가해야함
+			selectComingDayPanel = new SelectDatePanel("comingday");
+			GridBagConstraints gbc_selectComingDayPanel = new GridBagConstraints();
+			gbc_selectComingDayPanel.fill = GridBagConstraints.VERTICAL;
+			gbc_selectComingDayPanel.insets = new Insets(0, 0, 5, 0);
+			gbc_selectComingDayPanel.gridx = 0;
+			gbc_selectComingDayPanel.gridy = gridy++;
+			target.add(selectComingDayPanel, gbc_selectComingDayPanel);
+			selectComingDayPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+			selectComingDayPanel.setBorder(titled);
+		}
+
+		{
+			JPanel showHeadCntPanel = new JPanel();
+			GridBagConstraints gbc_showHeadCntPanel = new GridBagConstraints();
+			gbc_showHeadCntPanel.fill = GridBagConstraints.BOTH;
+			gbc_showHeadCntPanel.insets = new Insets(0, 0, 5, 0);
+			gbc_showHeadCntPanel.gridx = 0;
+			gbc_showHeadCntPanel.gridy = gridy;
+			target.add(showHeadCntPanel, gbc_showHeadCntPanel);
+			showHeadCntPanel.setBorder(titled);
+			gridy++;
+
+			JPanel showCountDetailPanel = new JPanel();
+			showHeadCntPanel.add(showCountDetailPanel);
+			showCountDetailPanel.setLayout(new GridLayout(0, 1, 0, 0));
+
+			JLabel headCountPanel = new JLabel("승객 인원");
+			headCountPanel.setHorizontalAlignment(SwingConstants.CENTER);
+			headCountPanel.setFont(new Font("굴림", Font.PLAIN, 20));
+			showCountDetailPanel.add(headCountPanel);
+
+			JPanel countDetailFractionPanel = new JPanel();
+
+			showCountDetailPanel.add(countDetailFractionPanel);
+			GridBagLayout gbl_countDetailFractionPanel = new GridBagLayout();
+			gbl_countDetailFractionPanel.columnWidths = new int[] { 30, 160, 30, 160, 30, 160, 30, 0 };
+			gbl_countDetailFractionPanel.rowHeights = new int[] { 24, 0 };
+			gbl_countDetailFractionPanel.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+					Double.MIN_VALUE };
+			gbl_countDetailFractionPanel.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
+			countDetailFractionPanel.setLayout(gbl_countDetailFractionPanel);
+
+			JLabel childCountLabel = new JLabel("어린이 0명");
+			childCountLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			childCountLabel.setFont(new Font("굴림", Font.BOLD, 28));
+			GridBagConstraints gbc_childCountLabel = new GridBagConstraints();
+			gbc_childCountLabel.anchor = GridBagConstraints.NORTH;
+			gbc_childCountLabel.insets = new Insets(0, 0, 0, 5);
+			gbc_childCountLabel.gridx = 1;
+			gbc_childCountLabel.gridy = 0;
+			countDetailFractionPanel.add(childCountLabel, gbc_childCountLabel);
+
+			JLabel adultCountLabel = new JLabel("어른 0명");
+			adultCountLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			adultCountLabel.setFont(new Font("굴림", Font.BOLD, 28));
+			GridBagConstraints gbc_adultCountLabel = new GridBagConstraints();
+			gbc_adultCountLabel.anchor = GridBagConstraints.NORTH;
+			gbc_adultCountLabel.insets = new Insets(0, 0, 0, 5);
+			gbc_adultCountLabel.gridx = 3;
+			gbc_adultCountLabel.gridy = 0;
+			countDetailFractionPanel.add(adultCountLabel, gbc_adultCountLabel);
+
+			JLabel seniorCountLabel = new JLabel("경로 0명");
+			seniorCountLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			seniorCountLabel.setFont(new Font("굴림", Font.BOLD, 28));
+			GridBagConstraints gbc_seniorCountLabel = new GridBagConstraints();
+			gbc_seniorCountLabel.insets = new Insets(0, 0, 0, 5);
+			gbc_seniorCountLabel.anchor = GridBagConstraints.NORTH;
+			gbc_seniorCountLabel.gridx = 5;
+			gbc_seniorCountLabel.gridy = 0;
+			countDetailFractionPanel.add(seniorCountLabel, gbc_seniorCountLabel);
+
+			JPanel selectHeadCntPanel = new JPanel();
+			GridBagConstraints gbc_selectHeadCntPaenl = new GridBagConstraints();
+			gbc_selectHeadCntPaenl.fill = GridBagConstraints.BOTH;
+			gbc_selectHeadCntPaenl.gridx = 0;
+			gbc_selectHeadCntPaenl.gridy = gridy;
+			target.add(selectHeadCntPanel, gbc_selectHeadCntPaenl);
+			selectHeadCntPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+			selectHeadCntPanel.setBorder(titled);
+
+			JPanel selectDetailCountPanel = new JPanel();
+			selectHeadCntPanel.add(selectDetailCountPanel);
+			selectDetailCountPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+
+			JPanel selectChildCountPanel = new JPanel();
+			selectDetailCountPanel.add(selectChildCountPanel);
+			selectChildCountPanel.setLayout(new GridLayout(0, 1, 0, 0));
+
+			JLabel selectChildLabel = new JLabel("어린이");
+			selectChildLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			selectChildLabel.setFont(new Font("굴림", Font.PLAIN, 20));
+			selectChildCountPanel.add(selectChildLabel);
+
+			JPanel selectChildCount = new JPanel();
+			selectChildCountPanel.add(selectChildCount);
+
+			JButton decreaseChildCntButton = new JButton("-");
+			selectChildCount.add(decreaseChildCntButton);
+
+			JTextField childCntTextField = new JTextField("0");
+			childCntTextField.setHorizontalAlignment(SwingConstants.CENTER);
+			childCntTextField.setColumns(10);
+			selectChildCount.add(childCntTextField);
+
+			decreaseChildCntButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					decreaseCount(childCntTextField);
+				}
+			});
+
+			childCntTextField.getDocument().addDocumentListener(new DocumentListener() {
+				public void insertUpdate(DocumentEvent e) {
+					childCountLabel.setText("어린이 " + childCntTextField.getText() + "명");
+				}
+
+				public void removeUpdate(DocumentEvent e) {
+				}
+
+				public void changedUpdate(DocumentEvent e) {
+				}
+			});
+			childCntTextField.addKeyListener(new KeyAdapter() {
+				public void keyTyped(KeyEvent e) {
+					Constants.numberFormatLimit(e, 1);
+				}
+
+				public void keyReleased(KeyEvent e) {
+					setNumberLimit((JTextField) e.getSource());
+				}
+			});
+
+			JButton increaseChildCntButton = new JButton("+");
+			selectChildCount.add(increaseChildCntButton);
+			increaseChildCntButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					increaseCount(childCntTextField);
+				}
+			});
+
+			JPanel selectAdultCountPanel = new JPanel();
+			selectDetailCountPanel.add(selectAdultCountPanel);
+			selectAdultCountPanel.setLayout(new GridLayout(0, 1, 0, 0));
+
+			JLabel selectAdultLabel = new JLabel("어른");
+			selectAdultLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			selectAdultLabel.setFont(new Font("굴림", Font.PLAIN, 20));
+			selectAdultCountPanel.add(selectAdultLabel);
+
+			JPanel selectAdultCount = new JPanel();
+			selectAdultCountPanel.add(selectAdultCount);
+
+			JButton decreaseAdultCntButton = new JButton("-");
+			selectAdultCount.add(decreaseAdultCntButton);
+
+			JTextField adultCntTextField = new JTextField("0");
+			adultCntTextField.setHorizontalAlignment(SwingConstants.CENTER);
+			adultCntTextField.setColumns(10);
+			selectAdultCount.add(adultCntTextField);
+
+			adultCntTextField.getDocument().addDocumentListener(new DocumentListener() {
+				public void insertUpdate(DocumentEvent e) {
+					adultCountLabel.setText("어른 " + adultCntTextField.getText() + "명");
+				}
+
+				public void removeUpdate(DocumentEvent e) {
+				}
+
+				public void changedUpdate(DocumentEvent e) {
+				}
+			});
+
+			adultCntTextField.addKeyListener(new KeyAdapter() {
+				public void keyTyped(KeyEvent e) {
+					Constants.numberFormatLimit(e, 1);
+				}
+			});
+
+			decreaseAdultCntButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					decreaseCount(adultCntTextField);
+				}
+			});
+
+			JButton increaseAdultCntButton = new JButton("+");
+			selectAdultCount.add(increaseAdultCntButton);
+			
+			increaseAdultCntButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					increaseCount(adultCntTextField);
+				}
+			});
+
+			JPanel selectSeniorCountPanel = new JPanel();
+			selectDetailCountPanel.add(selectSeniorCountPanel);
+			selectSeniorCountPanel.setLayout(new GridLayout(0, 1, 0, 0));
+
+			JLabel selectSeniorLabel = new JLabel("경로");
+			selectSeniorLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			selectSeniorLabel.setFont(new Font("굴림", Font.PLAIN, 20));
+			selectSeniorCountPanel.add(selectSeniorLabel);
+
+			JPanel selectSeniorCount = new JPanel();
+			selectSeniorCountPanel.add(selectSeniorCount);
+
+			JButton decreaseSeniorCntButton = new JButton("-");
+			selectSeniorCount.add(decreaseSeniorCntButton);
+
+			JTextField seniorCntTextField = new JTextField("0");
+			seniorCntTextField.setHorizontalAlignment(SwingConstants.CENTER);
+			seniorCntTextField.setColumns(10);
+			selectSeniorCount.add(seniorCntTextField);
+
+			decreaseSeniorCntButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					decreaseCount(seniorCntTextField);
+				}
+			});
+			
+			seniorCntTextField.getDocument().addDocumentListener(new DocumentListener() {
+				public void insertUpdate(DocumentEvent e) {
+					seniorCountLabel.setText("경로 " + seniorCntTextField.getText() + "명");
+				}
+
+				public void removeUpdate(DocumentEvent e) {
+				}
+
+				public void changedUpdate(DocumentEvent e) {
+				}
+			});
+
+			seniorCntTextField.addKeyListener(new KeyAdapter() {
+				public void keyTyped(KeyEvent e) {
+					Constants.numberFormatLimit(e, 1);
+				}
+			});
+
+			JButton increaseSeniorCntButton = new JButton("+");
+			selectSeniorCount.add(increaseSeniorCntButton);
+
+			increaseSeniorCntButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					increaseCount(seniorCntTextField);
+				}
+			});
+
+		}
+	}
+	
+	private void initSeasonPanel(JPanel target) {
+		
+	}
+	
+	private void initInquiryButton() {
+		JFrame thisObj = this;
+		JButton trainInquiryButton = new JButton("열차 조회");
+		trainInquiryButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int selectedIndex = reservTicketTabbedPane.getSelectedIndex();
+				JPanel selectedTab = (JPanel) reservTicketTabbedPane.getSelectedComponent();
+				SelectDatePanel datePanel = (SelectDatePanel)selectedTab.getComponent(1);
+				
+				String dayToGo = datePanel.getTextFieldText("yearTextField")
+						+ String.format("%02d", Integer.parseInt(datePanel.getTextFieldText("monthTextField")))
+						+ String.format("%02d", Integer.parseInt(datePanel.getTextFieldText("dayTextField")));
+				String dayComing = null;
+				
+				int personnel = selectedIndex == 0 ? oneway_personnel : round_personnel;
+				
+				if(selectedIndex == 1) {
+					datePanel = (SelectDatePanel)selectedTab.getComponent(2);
+					dayComing = datePanel.getTextFieldText("yearTextField")
+							+ String.format("%02d", Integer.parseInt(datePanel.getTextFieldText("monthTextField")))
+							+ String.format("%02d", Integer.parseInt(datePanel.getTextFieldText("dayTextField")));
+				}
+
+				//날짜가 유효한가
+				if (dayToGo.compareTo(Constants.getTodayDateToString()) < 0 || (dayComing != null && dayComing.compareTo(dayToGo) < 0)) 
+				{
+					showDialog("<html><center>선택한 날짜가</center><center>유효하지 않습니다.</center></html>");
+				}
+				//인원이 유효한가
+				else if(personnel <= 0) {
+					showDialog("인원의 수가 0명입니다.");
+				}
+				// 정상 동작
+				else {
+					String depText = depComboBox.getComboBoxText();
+					String arrText = arrComboBox.getComboBoxText();
+
+					Queue<ArrayList<TrainVo>> command = new LinkedList<ArrayList<TrainVo>>();
+					command.add(TrainAPI.getInstance().getTrainList(depText, arrText, dayToGo));
+
+					if (reservTicketTabbedPane.getSelectedIndex() == 1) {
+						command.add(TrainAPI.getInstance().getTrainList(arrText, depText, dayComing));
+						personnel = round_personnel;
+					}
+
+					new TrainInquiryMenu(command, thisObj, personnel).setVisible(true);
+					setVisible(false);
+				}
+
+			}
+		});
+		
+		trainInquiryButton.setFont(new Font("맑은 고딕", Font.PLAIN, 24));
+		reservTicketPanel.add(trainInquiryButton, BorderLayout.SOUTH);
+	}
+	
 	private void setWelcoming() {
 		welcomeLabel.setText("<html>안녕하세요.<br><center>" + userVo.getName() + "님</center></html>");
 	}
-	
-	private void numberFormatLimit(KeyEvent e, int limit) {
-		char c = e.getKeyChar();
-		if (!Character.isDigit(c)) {
-			e.consume();
-			return;
-		}
-
-		if (((JTextField) e.getSource()).getText().length() > limit - 1) {
-			e.consume();
-			return;
-		}
-	}
-
-	private void initializeDate(JTextField year, JTextField month, JTextField day) {
-		Calendar cal = Calendar.getInstance();
-
-		year.setText(String.format("%d", cal.get(Calendar.YEAR)));
-		month.setText(String.format("%d", cal.get(Calendar.MONTH) + 1));
-		day.setText(String.format("%d", cal.get(Calendar.DAY_OF_MONTH)));
-	}
-
-	private void decreaseDate(JTextField tf) {
-		int value = Integer.parseInt(tf.getText());
-		value--;
-		if (value < 1) {
-			value = 1;
-		}
-		tf.setText(String.format("%d", value));
-	}
-
-	private void increaseDate(JTextField tf, String year, String month, boolean isDay) {
-		int value = Integer.parseInt(tf.getText());
-		value++;
-
-		if (month != null) {
-			int maxDay = getMaximumDay(year, month);
-			if (value > maxDay) {
-				value = maxDay;
-			}
-			tf.setText(String.format("%d", value));
-			setValidValue(tf, year, month, isDay);
-		} else
-			tf.setText(String.format("%d", value));
-	}
-
-	private void setValidValue(JTextField tf, String year, String month, boolean isDay) {
-		if (tf.getText().equals(""))
-			return;
-
-		int textInt = Integer.parseInt(tf.getText());
-		// dayTextField일 경우
-		if (isDay) {
-			int maxDay = getMaximumDay(year, month);
-			if (textInt > maxDay)
-				tf.setText(String.format("%d", maxDay));
-			else if (textInt < 1)
-				tf.setText("1");
-		}
-		// monthTextField일 경우
-		else {
-			if (textInt > 12)
-				tf.setText("12");
-			else if (textInt < 1)
-				tf.setText("1");
-		}
-
-	}
-
-	private int getMaximumDay(String year, String month) {
-		SimpleDateFormat fm = new SimpleDateFormat("yyyyMM");
-		Date date = null;
-		try {
-			date = fm.parse(year + String.format("%02d", Integer.parseInt(month)));
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(date);
-
-		int corDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-
-		return corDay;
-	}
 
 	private void increaseCount(JTextField tf) {
-		if(personnel >= 9) return;
-		personnel++;
+		if(reservTicketTabbedPane.getSelectedIndex() == 0) {
+			if(oneway_personnel >= 9) return;
+			oneway_personnel++;
+		}
+		else {
+			if(round_personnel >= 9) return;
+			round_personnel++;
+		}
+		
 		setNumberLimit(tf);
 		int tmp = Integer.parseInt(tf.getText());
 		tmp++;
@@ -879,7 +701,15 @@ public class MainMenu extends JFrame {
 	}
 
 	private void decreaseCount(JTextField tf) {
-		personnel--;
+		if(reservTicketTabbedPane.getSelectedIndex() == 0) {
+			if(oneway_personnel <= 0) return;
+			oneway_personnel--;
+		}
+		else {
+			if(round_personnel <= 0) return;
+			round_personnel--;
+		}
+		
 		setNumberLimit(tf);
 		int tmp = Integer.parseInt(tf.getText());
 		tmp--;

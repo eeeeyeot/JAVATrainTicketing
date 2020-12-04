@@ -1,4 +1,4 @@
-package view;
+package view_component;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -13,6 +13,9 @@ import javax.swing.border.TitledBorder;
 import constants.Constants;
 import database.TicketVo;
 import database.TrainDAO;
+import view.MainMenu;
+import view.NoticeDialog;
+import view.TicketViewMenu;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

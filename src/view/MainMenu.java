@@ -404,7 +404,12 @@ public class MainMenu extends JFrame {
 		depComboBox.setDefault("서울");
 		arrComboBox.setDefault("대전");
 		
-		SelectDatePanel selectDepDatePanel = new SelectDatePanel("oneway");
+		SelectDatePanel selectDepDatePanel;
+		if(type.equals("roundtrip"))
+			selectDepDatePanel = new SelectDatePanel("daytogo");
+		else
+			selectDepDatePanel = new SelectDatePanel("oneway");
+		
 		GridBagConstraints gbc_selectDepDatePanel = new GridBagConstraints();
 		gbc_selectDepDatePanel.fill = GridBagConstraints.BOTH;
 		gbc_selectDepDatePanel.insets = new Insets(0, 0, 5, 0);
@@ -669,11 +674,17 @@ public class MainMenu extends JFrame {
 				
 				int selectedIndex = 0;
 				if(reservTicketLayeredPane.getComponentCountInLayer(2) > 0)
+				{
+					System.out.println("편도");
 					selectedIndex = 0;
+				}
 				else
+				{
+					System.out.println("왕복");
 					selectedIndex = 1;
+				}
 				
-				JPanel selectedTab = (JPanel) reservTicketLayeredPane.getComponentsInLayer(selectedIndex)[0];
+				JPanel selectedTab = (JPanel) reservTicketLayeredPane.getComponentsInLayer(selectedIndex == 0 ? 2 : 1)[0];
 				
 				System.out.println("선택된 레이어 : " + selectedIndex);
 				

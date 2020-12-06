@@ -456,7 +456,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		return this;
 	}
 	public TrainInquiryMenu setChildCount(int childCount) {
-		this.childCharge = childCount * currentTrainVo.get;
+		this.childCharge = childCount * currentTrainVo.getFee();
 		return this;
 	}
 	public TrainInquiryMenu setAdultCount(int personnel) {

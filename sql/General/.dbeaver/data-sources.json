@@ -1,0 +1,54 @@
+{
+	"folders": {},
+	"connections": {
+		"oracle_thin-175ab032219-6b6c9f0346dcd094": {
+			"provider": "oracle",
+			"driver": "oracle_thin",
+			"name": "XE",
+			"save-password": true,
+			"show-system-objects": true,
+			"read-only": false,
+			"configuration": {
+				"host": "localhost",
+				"port": "1521",
+				"database": "XE",
+				"url": "jdbc:oracle:thin:@(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = DESKTOP-912HOCH)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = XE) ) )",
+				"home": "D:\\OracleDB\\app\\oracle\\product\\11.2.0\\server",
+				"type": "dev",
+				"provider-properties": {
+					"@dbeaver-connection-type@": "TNS",
+					"@dbeaver-sid-service@": "SERVICE",
+					"@dbeaver-check-schema-content@": "false",
+					"@dbeaver-always-show-dba@": "false",
+					"@dbeaver-always-use-dba-views@": "false",
+					"@dbeaver-meta-use-sys-schema@": "false",
+					"@dbeaver-meta-use-simple-constraints@": "false",
+					"@dbeaver-use-rule-hint@": "false",
+					"@dbeaver-use-meta-optimizer@": "false"
+				},
+				"auth-model": "oracle_native"
+			}
+		}
+	},
+	"virtual-models": {
+		"oracle_thin-175ab032219-6b6c9f0346dcd094": {
+			"GREEN": {
+				"@properties": {
+					"erd.diagram.state": {
+						"serialized": "<diagram version=\"1\" name=\"GREEN\" time=\"202011171302\"><entities><data-source id=\"oracle_thin-175ab032219-6b6c9f0346dcd094\"><entity id=\"1\" name=\"CLASS\" fq-name=\"GREEN.CLASS\" order=\"0\" x=\"194\" y=\"20\"><path name=\"GREEN\"/></entity><entity id=\"2\" name=\"COURSE\" fq-name=\"GREEN.COURSE\" order=\"1\" x=\"340\" y=\"20\"><path name=\"GREEN\"/></entity><entity id=\"3\" name=\"DEPARTMENT\" fq-name=\"GREEN.DEPARTMENT\" order=\"2\" x=\"498\" y=\"267\"><path name=\"GREEN\"/></entity><entity id=\"4\" name=\"DEPT\" fq-name=\"GREEN.DEPT\" order=\"3\" x=\"194\" y=\"418\"><path name=\"GREEN\"/></entity><entity id=\"5\" name=\"EMP\" fq-name=\"GREEN.EMP\" order=\"4\" x=\"20\" y=\"370\"><path name=\"GREEN\"/></entity><entity id=\"6\" name=\"FARE\" fq-name=\"GREEN.FARE\" order=\"5\" x=\"177\" y=\"739\"><path name=\"GREEN\"/></entity><entity id=\"7\" name=\"PROFESSOR\" fq-name=\"GREEN.PROFESSOR\" order=\"6\" x=\"340\" y=\"143\"><path name=\"GREEN\"/></entity><entity id=\"8\" name=\"RESERVATION\" fq-name=\"GREEN.RESERVATION\" order=\"7\" x=\"190\" y=\"620\"><path name=\"GREEN\"/></entity><entity id=\"9\" name=\"STUDENT\" fq-name=\"GREEN.STUDENT\" order=\"8\" x=\"194\" y=\"238\"><path name=\"GREEN\"/></entity><entity id=\"10\" name=\"TAKES\" fq-name=\"GREEN.TAKES\" order=\"9\" x=\"20\" y=\"168\"><path name=\"GREEN\"/></entity><entity id=\"11\" name=\"TICKET\" fq-name=\"GREEN.TICKET\" order=\"10\" x=\"20\" y=\"588\"><path name=\"GREEN\"/></entity><entity id=\"12\" name=\"USERDATA\" fq-name=\"GREEN.USERDATA\" order=\"11\" x=\"331\" y=\"585\"><path name=\"GREEN\"/></entity></data-source></entities><relations><relation name=\"FK_TAKES2\" fq-name=\"GREEN.TAKES.FK_TAKES2\" type=\"fk\" pk-ref=\"1\" fk-ref=\"10\"/><relation name=\"FK_CLASS1\" fq-name=\"GREEN.CLASS.FK_CLASS1\" type=\"fk\" pk-ref=\"2\" fk-ref=\"1\"/><relation name=\"FK_PROFESSOR\" fq-name=\"GREEN.PROFESSOR.FK_PROFESSOR\" type=\"fk\" pk-ref=\"3\" fk-ref=\"7\"/><relation name=\"FK_STUDENT\" fq-name=\"GREEN.STUDENT.FK_STUDENT\" type=\"fk\" pk-ref=\"3\" fk-ref=\"9\"/><relation name=\"FK_DEPTNO\" fq-name=\"GREEN.EMP.FK_DEPTNO\" type=\"fk\" pk-ref=\"4\" fk-ref=\"5\"/><relation name=\"FK_CLASS2\" fq-name=\"GREEN.CLASS.FK_CLASS2\" type=\"fk\" pk-ref=\"7\" fk-ref=\"1\"/><relation name=\"FK_TICKET\" fq-name=\"GREEN.TICKET.FK_TICKET\" type=\"fk\" pk-ref=\"8\" fk-ref=\"11\"/><relation name=\"FK_TAKES1\" fq-name=\"GREEN.TAKES.FK_TAKES1\" type=\"fk\" pk-ref=\"9\" fk-ref=\"10\"/><relation name=\"FK_RESERVATION\" fq-name=\"GREEN.RESERVATION.FK_RESERVATION\" type=\"fk\" pk-ref=\"12\" fk-ref=\"8\"/></relations></diagram>"
+					}
+				}
+			}
+		}
+	},
+	"connection-types": {
+		"dev": {
+			"name": "Development",
+			"color": "255,255,255",
+			"description": "Regular development database",
+			"auto-commit": true,
+			"confirm-execute": false,
+			"confirm-data-change": false
+		}
+	}
+}

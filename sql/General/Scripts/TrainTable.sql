@@ -17,6 +17,15 @@ CREATE TABLE reservation
 	REFERENCES userdata (user_id)
 );
 
+CREATE TABLE RESERVATION_SEASON 
+(
+	user_id			varchar(20) NOT NULL,
+	season_id		number(20) NOT NULL,
+	CONSTRAINT pk_reservation_season PRIMARY KEY (season_id),
+	CONSTRAINT fk_reservation_season FOREIGN KEY (user_id) 
+	REFERENCES userdata (user_id)
+)
+
 CREATE TABLE Ticket (
 	ticket_id		number(10) NOT NULL,
 	deppland_place	varchar(20) NOT NULL,
@@ -29,15 +38,22 @@ CREATE TABLE Ticket (
 	arrpland_time	DATE NOT NULL,
 	price			int NOT NULL,
 	ticketing_day	DATE NOT NULL,
-	ticket_type		int NOT NULL,
-	term			int,
-	effective_date	DATE,
-	expiration_date	DATE,
 	CONSTRAINT fk_ticket FOREIGN KEY (ticket_id)
 	REFERENCES reservation (ticket_id)
 );
 
-CREATE TABLE fee
+CREATE TABLE SEASON_Ticket (
+	season_id		number(10) NOT NULL,
+	deppland_place	varchar(20) NOT NULL,
+	arrpland_place	varchar(20) NOT NULL,
+	term			int NOT NULL,
+	effective_date	DATE NOT NULL,
+	expiration_date	DATE NOT NULL,
+	CONSTRAINT fk_season FOREIGN KEY (season_id)
+	REFERENCES reservation_season (season_id)
+)
+
+CREATE TABLE fare
 (
 	passenger_type		varchar(20) NOT NULL,
 	standing_price		int NOT NULL,

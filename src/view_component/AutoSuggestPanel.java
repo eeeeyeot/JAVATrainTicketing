@@ -60,7 +60,7 @@ public class AutoSuggestPanel extends JPanel{
 		tf.setText("");
 	}
 	
-	DefaultComboBoxModel<String> getComboBoxModel(Vector<String> v, String text){
+	private DefaultComboBoxModel<String> getComboBoxModel(Vector<String> v, String text){
 		DefaultComboBoxModel<String> m = new DefaultComboBoxModel<String>();
 		for(String s : v) {
 			if(s.startsWith(text)) m.addElement(s);

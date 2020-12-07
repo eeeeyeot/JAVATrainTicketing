@@ -35,18 +35,16 @@ public class SelectDatePanel extends JPanel {
 	
 	public SelectDatePanel(String type) {
 		String title;
-		if(type.equals("oneway")) {
+		if(type.equals("oneway"))
 			title = "출 발 일";
-		}
-		else if(type.equals("daytogo")) {
+		else if(type.equals("daytogo"))
 			title = "가 는 날";
-		}
-		else if(type.equals("comingday")){
+		else if(type.equals("comingday"))
 			title = "오 는 날";
-		}
-		else {
+		else if(type.equals("season"))
+			title = "사 용 기 간";
+		else
 			title = "something wrong";
-		}
 		
 		TitledBorder titled = new TitledBorder(new LineBorder(Color.LIGHT_GRAY, 2));
 		setBorder(titled);
@@ -54,12 +52,14 @@ public class SelectDatePanel extends JPanel {
 		
 		JLabel dateLabel = new JLabel(title);
 		dateLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		dateLabel.setFont(new Font("나눔스퀘어", Font.PLAIN, 20));
+		dateLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 20));
 		add(dateLabel, BorderLayout.NORTH);
-
+		dateLabel.setBorder(titled);
+		
 		JPanel detailDatePanel = new JPanel();
 		add(detailDatePanel);
 		detailDatePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		detailDatePanel.setBorder(titled);
 		
 		JPanel yearSelectPanel = new JPanel();
 		detailDatePanel.add(yearSelectPanel);

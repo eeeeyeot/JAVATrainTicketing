@@ -74,7 +74,7 @@ public class TicketViewMenu extends JFrame {
 		titlePanel.setLayout(new GridLayout(0, 1, 0, 0));
 		
 		JLabel titleLabel = new JLabel("승차권");
-		titleLabel.setFont(new Font("나눔스퀘어 Bold", Font.PLAIN, 20));
+		titleLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 20));
 		titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		titlePanel.add(titleLabel);
 		titleLabel.setBorder(titled);
@@ -90,7 +90,7 @@ public class TicketViewMenu extends JFrame {
 		
 		reservationDateLabel = new JLabel("2020년 00월 00일 (월)");
 		reservationDateLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		reservationDateLabel.setFont(new Font("나눔스퀘어", Font.PLAIN, 20));
+		reservationDateLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 20));
 		datePanel.add(reservationDateLabel);
 		reservationDateLabel.setBorder(titled);
 		
@@ -125,7 +125,7 @@ public class TicketViewMenu extends JFrame {
 		
 		depPlandPlace = new JLabel("서울");
 		depPlandPlace.setHorizontalAlignment(SwingConstants.CENTER);
-		depPlandPlace.setFont(new Font("나눔스퀘어", Font.PLAIN, 18));
+		depPlandPlace.setFont(new Font("맑은 고딕", Font.PLAIN, 18));
 		GridBagConstraints gbc_depPlandPlace = new GridBagConstraints();
 		gbc_depPlandPlace.fill = GridBagConstraints.VERTICAL;
 		gbc_depPlandPlace.insets = new Insets(0, 0, 0, 5);
@@ -135,7 +135,7 @@ public class TicketViewMenu extends JFrame {
 		
 		JLabel arrowLabel = new JLabel("→");
 		arrowLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		arrowLabel.setFont(new Font("나눔스퀘어", Font.PLAIN, 18));
+		arrowLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 18));
 		GridBagConstraints gbc_arrowLabel = new GridBagConstraints();
 		gbc_arrowLabel.fill = GridBagConstraints.VERTICAL;
 		gbc_arrowLabel.insets = new Insets(0, 0, 0, 5);
@@ -145,7 +145,7 @@ public class TicketViewMenu extends JFrame {
 		
 		arrPlandPlace = new JLabel("대전");
 		arrPlandPlace.setHorizontalAlignment(SwingConstants.CENTER);
-		arrPlandPlace.setFont(new Font("나눔스퀘어", Font.PLAIN, 18));
+		arrPlandPlace.setFont(new Font("맑은 고딕", Font.PLAIN, 18));
 		GridBagConstraints gbc_arrPlandPlace = new GridBagConstraints();
 		gbc_arrPlandPlace.insets = new Insets(0, 0, 0, 5);
 		gbc_arrPlandPlace.fill = GridBagConstraints.VERTICAL;
@@ -168,7 +168,7 @@ public class TicketViewMenu extends JFrame {
 		arrPlacePanel.setBorder(titled);
 		
 		depPlandTime = new JLabel("05:05");
-		depPlandTime.setFont(new Font("나눔스퀘어", Font.PLAIN, 18));
+		depPlandTime.setFont(new Font("맑은 고딕", Font.PLAIN, 18));
 		depPlandTime.setHorizontalAlignment(SwingConstants.CENTER);
 		GridBagConstraints gbc_depPlandTime = new GridBagConstraints();
 		gbc_depPlandTime.fill = GridBagConstraints.VERTICAL;
@@ -178,7 +178,7 @@ public class TicketViewMenu extends JFrame {
 		arrPlacePanel.add(depPlandTime, gbc_depPlandTime);
 		
 		arrPlandTime = new JLabel("06:35");
-		arrPlandTime.setFont(new Font("나눔스퀘어", Font.PLAIN, 18));
+		arrPlandTime.setFont(new Font("맑은 고딕", Font.PLAIN, 18));
 		arrPlandTime.setHorizontalAlignment(SwingConstants.CENTER);
 		GridBagConstraints gbc_arrPlandTime = new GridBagConstraints();
 		gbc_arrPlandTime.insets = new Insets(0, 0, 0, 5);
@@ -199,7 +199,7 @@ public class TicketViewMenu extends JFrame {
 		
 		trainInfoLabel = new JLabel("무궁화호  1551");
 		trainInfoLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		trainInfoLabel.setFont(new Font("나눔스퀘어", Font.PLAIN, 18));
+		trainInfoLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 18));
 		trainInfoPanel.add(trainInfoLabel);
 		
 		JPanel reservationInfoPanel = new JPanel();

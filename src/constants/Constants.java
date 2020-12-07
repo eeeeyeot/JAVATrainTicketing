@@ -32,7 +32,15 @@ public class Constants {
 		return sb.toString();
 	}
 	
-
+	public static String getAddedDate(int field, int amount) {
+		StringBuilder sb = new StringBuilder();
+		cal.add(field, amount);
+		
+		sb.append(getTodayTimeToString());
+		
+		cal = Calendar.getInstance();
+		return sb.toString();
+	}
 	
 	public static String getDateKorean(String time) {
 		StringBuilder sb = new StringBuilder();
@@ -45,6 +53,24 @@ public class Constants {
 		
 		sb.append(cal.get(Calendar.YEAR)).append("년 ").append(cal.get(Calendar.MONTH) + 1).append("월 ").append(cal.get(Calendar.DAY_OF_MONTH)).append("일 ")
 		.append(cal.get(Calendar.HOUR_OF_DAY)).append("시 ").append(cal.get(Calendar.MINUTE)).append("분");
+		
+		cal = Calendar.getInstance();
+		
+		return sb.toString();
+	}
+	
+	public static String getDateKoreanWithLineBreak(String time) {
+		StringBuilder sb = new StringBuilder();
+		SimpleDateFormat sf = new SimpleDateFormat("yyyyMMddHHmm");
+		
+		try {
+			cal.setTime(sf.parse(time));
+		}
+		catch(Exception e) {}
+		
+		sb.append("<html><center>").append(cal.get(Calendar.YEAR)).append("년 ").append(cal.get(Calendar.MONTH) + 1).append("월 ")
+		.append(cal.get(Calendar.DAY_OF_MONTH)).append("일 ").append("</center><center>")
+		.append(cal.get(Calendar.HOUR_OF_DAY)).append("시 ").append(cal.get(Calendar.MINUTE)).append("분").append("</center></html>");
 		
 		cal = Calendar.getInstance();
 		

@@ -123,19 +123,18 @@ public class TrainDAO
 					continue;
 				}
 				
-				TicketVo vo = new TicketVo();
-				
-				vo.setTicket_id(rs.getString("TICKET_ID"));
-				vo.setDeppland_place(rs.getString("DEPPLAND_PLACE"));
-				vo.setArrpland_place(rs.getString("ARRPLAND_PLACE"));
-				vo.setTrain_name(rs.getString("TRAIN_NAME"));
-				vo.setCar_number(rs.getString("CAR_NUMBER"));
-				vo.setSeat(rs.getString("SEAT"));
-				vo.setPersonnel(rs.getString("PERSONNEL"));
-				vo.setDeppland_time(getDateToString(rs.getString("DEPPLAND_TIME")));
-				vo.setArrpland_time(getDateToString(rs.getString("ARRPLAND_TIME")));
-				vo.setPrice(rs.getString("PRICE"));
-				vo.setTicketing_day(getDateToString(rs.getString("TICKETING_DAY")));
+				TicketVo vo = new TicketVo()
+						.setTicket_id("TICKET_ID")
+						.setDeppland_place(rs.getString("DEPPLAND_PLACE"))
+						.setArrpland_place(rs.getString("ARRPLAND_PLACE"))
+						.setTrain_name(rs.getString("TRAIN_NAME"))
+						.setCar_number(rs.getString("CAR_NUMBER"))
+						.setSeat(rs.getString("SEAT"))
+						.setPersonnel(rs.getString("PERSONNEL"))
+						.setDeppland_time(getDateToString(rs.getString("DEPPLAND_TIME")))
+						.setArrpland_time(getDateToString(rs.getString("ARRPLAND_TIME")))
+						.setPrice(rs.getString("PRICE"))
+						.setTicketing_day(getDateToString(rs.getString("TICKETING_DAY")));
 				
 				list.add(vo);
 			}
@@ -150,6 +149,107 @@ public class TrainDAO
 		if(list.size() == 0) return null;
 		
 		return list;
+	}
+	
+	public ArrayList<SeasonTicketVo> getSeasonList(String user_id) {
+		ArrayList<SeasonTicketVo> list = new ArrayList<SeasonTicketVo>();
+		String sql = "SELECT s.SEASON_ID, s.DEPPLAND_PLACE, s.ARRPLAND_PLACE, s.TERM, s.EFFECTIVE_DATE, s.EXPIRATION_DATE " +
+				"FROM SEASON_TICKET s, RESERVATION_SEASON r WHERE s.SEASON_ID = r.SEASON_ID AND r.USER_ID = '" + user_id + "'";
+		System.out.println(sql);
+		try {
+			rs = stmt.executeQuery(sql);
+			
+			while(rs.next()) {
+				if(Constants.getTodayTimeToString().compareTo(getDateToString(rs.getString("EXPIRATION_DATE"))) > 0) {
+					deleteSeason(rs.getString("SEASON_ID"));
+					continue;
+				}
+				
+				SeasonTicketVo vo = new SeasonTicketVo()
+						.setSeason_id(rs.getString("SEASON_ID"))
+						.setDepplandPlace(rs.getString("DEPPLAND_PLACE"))
+						.setArrplandPlace(rs.getString("ARRPLAND_PLACE"))
+						.setTerm(Integer.parseInt(rs.getString("TERM")))
+						.setEffDate(getDateToString(rs.getString("EFFECTIVE_DATE")))
+						.setExpDate(getDateToString(rs.getString("EXPIRATION_DATE")));
+				
+				System.out.println(vo);
+				
+				list.add(vo);
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		if(list.size() == 0) return null;
+		
+		return list;
+	}
+	
+	public boolean deleteReservation(String ticket_id) {
+		try {
+			String sql = "DELETE FROM ticket WHERE ticket_id = " + ticket_id;
+			System.out.println(sql);
+			ResultSet rs = stmt.executeQuery(sql);
+			
+			sql = "DELETE FROM reservation WHERE ticket_id = " + ticket_id;
+			System.out.println(sql);
+			rs = stmt.executeQuery(sql);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public boolean deleteSeason(String season_id) {
+		try {
+			String sql = "DELETE FROM season_ticket WHERE season_id = " + season_id;
+			System.out.println(sql);
+			ResultSet rs = stmt.executeQuery(sql);
+			
+			sql = "DELETE FROM reservation_season WHERE season_id = " + season_id;
+			System.out.println(sql);
+			rs = stmt.executeQuery(sql);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public boolean insertSeasonReservation(String userId, String seasonId) {
+		String sql = "insert into reservation_season values ('" + userId + "', " + seasonId + ")";
+		System.out.println(sql);
+		try {
+			rs = stmt.executeQuery(sql);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public boolean insertReservationData(String userId, String ticketId) {
+		String sql = "insert into reservation values ('" + userId + "', " + ticketId + ")";
+		System.out.println(sql);
+		try {
+			rs = stmt.executeQuery(sql);
+		}
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
 	}
 	
 	public boolean insertUserData(UserVo vo)
@@ -174,32 +274,14 @@ public class TrainDAO
 		return true;
 	}
 	
-	public boolean deleteReservation(String ticket_id) {
+	public boolean insertSeasonData(SeasonTicketVo vo) {
 		try {
-			String sql = "DELETE FROM ticket WHERE ticket_id = " + ticket_id;
-			System.out.println(sql);
-			ResultSet rs = stmt.executeQuery(sql);
-			
-			sql = "DELETE FROM reservation WHERE ticket_id = " + ticket_id;
+			String sql = "INSERT INTO season_ticket VALUES (" + vo.getSeason_id() + ", '" + vo.getDepplandPlace() + "', '" + vo.getArrplandPlace() + 
+					"', " + vo.getTerm() + ", " + vo.getEffDateByFormat() + ", " + vo.getExpDateByFormat() + ")";
 			System.out.println(sql);
 			rs = stmt.executeQuery(sql);
 		}
-		catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-		
-		return true;
-	}
-	
-	public boolean insertReservationData(String userId, String ticketId) {
-		try {
-			String sql = "insert into reservation values ('" + userId + "', " + ticketId + ")";
-			System.out.println(sql);
-			rs = stmt.executeQuery(sql);
-		}
-		catch (Exception e) 
-		{
+		catch(Exception e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -211,8 +293,8 @@ public class TrainDAO
 		try {
 			String sql = "insert into ticket values (" + vo.getTicket_id() + ", '" + vo.getDeppland_place() + "', '" 
 					+ vo.getArrpland_place() + "', '" + vo.getTrain_name() + "', " + vo.getCar_number() + ", '" + vo.getSeat() 
-					+ "', " + vo.getPersonnel() + ", "+ vo.getDepTimeDB() + ", "
-					+ vo.getArrTimeDB() + ", " + vo.getPrice() + ", " + vo.getTicketingDayDB() + ")";
+					+ "', " + vo.getPersonnel() + ", "+ vo.getDepTimeByFormat() + ", "
+					+ vo.getArrTimeByFormat() + ", " + vo.getPrice() + ", " + vo.getTicketingDayByFormat() + ")";
 			System.out.println(sql);
 			rs = stmt.executeQuery(sql);
 		}
@@ -249,7 +331,25 @@ public class TrainDAO
 		return userVo;
 	}
 	
-	public int getLastId() {
+	public int getLastSeasonId() {
+		int result = -1;
+		try {
+			String sql = "SELECT MAX(season_id) FROM SEASON_TICKET";
+			rs = stmt.executeQuery(sql);
+			
+			if(rs.next()) {
+				String maxSeasonId = rs.getString("MAX(SEASON_ID)");
+				if(maxSeasonId != null) 
+					result = Integer.parseInt(maxSeasonId);
+			}
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	public int getLastTicketId() {
 		int result = -1;
 		try {
 			String sql = "select MAX(ticket_id) from ticket";
@@ -263,7 +363,6 @@ public class TrainDAO
 		}
 		catch(Exception e) {
 			e.printStackTrace();
-			result = -1;
 		}
 		return result;
 	}

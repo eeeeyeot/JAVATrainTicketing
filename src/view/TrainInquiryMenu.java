@@ -54,8 +54,12 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 	private ArrayList<Integer> seatList;
 	private Queue<ArrayList<TrainVo>> commandQue;
 	private int personnel;
+	
+	@SuppressWarnings("unused")
 	private int childCharge;
+	@SuppressWarnings("unused")
 	private int adultCharge;
+	@SuppressWarnings("unused")
 	private int seniorCharge;
 	
 	private JFrame parent;
@@ -705,17 +709,19 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		((MainMenu)parent).addReservation(ticket.getTicket_id());
 		if(currentTrainVo == null)
 			System.out.println("currentVo is null");
-		ticket.setDeppland_place(currentTrainVo.getDepPlace());
-		ticket.setArrpland_place(currentTrainVo.getArrPlace());
-		ticket.setTrain_name(currentTrainVo.getTrainName());
-		ticket.setCar_number(currentTrainVo.getCarNumber());
-		ticket.setPersonnel(String.format("%d", personnel));
-		ticket.setSeat(getSeatString());
-		ticket.setDeppland_time(currentTrainVo.getDepplandTime());
-		ticket.setArrpland_time(currentTrainVo.getArrplandTime());
 		String tmpPrice = "1000";
-		ticket.setPrice(tmpPrice);
-		ticket.setTicketing_day(Constants.getTodayTimeToString());
+		
+		ticket.setDeppland_place(currentTrainVo.getDepPlace())
+		.setArrpland_place(currentTrainVo.getArrPlace())
+		.setTrain_name(currentTrainVo.getTrainName())
+		.setCar_number(currentTrainVo.getCarNumber())
+		.setPersonnel(String.format("%d", personnel))
+		.setSeat(getSeatString())
+		.setDeppland_time(currentTrainVo.getDepplandTime())
+		.setArrpland_time(currentTrainVo.getArrplandTime())
+		.setPrice(tmpPrice)
+		.setTicketing_day(Constants.getTodayTimeToString());
+		
 		dao.insertTicketData(ticket);
 		
 		ArrayList<TrainVo> newList = commandQue.poll();

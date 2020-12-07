@@ -1,7 +1,7 @@
 package database;
 
 public class TicketVo {
-	private static int lastID;
+	
 	private String ticket_id;		//not null	number
 	private String deppland_place;	//not null	varchar
 	private String arrpland_place;	//not null	varchar
@@ -19,7 +19,8 @@ public class TicketVo {
 	}
 	
 	public TicketVo(TrainDAO dao) {
-		if((lastID = dao.getLastId()) < 0) 
+		int lastID;
+		if((lastID = dao.getLastTicketId()) < 0) 
 			lastID = 0;
 		
 		ticket_id = String.format("%d", ++lastID);
@@ -39,62 +40,63 @@ public class TicketVo {
 	}
 	
 	public String getTicket_id() { return ticket_id; }
-	public void setTicket_id(String ticket_id) { this.ticket_id = ticket_id; }
+	public TicketVo setTicket_id(String ticket_id) { this.ticket_id = ticket_id; return this;}
 	
 	public String getDeppland_place() { return deppland_place; }
-	public void setDeppland_place(String deppland_place) { this.deppland_place = deppland_place; }
+	public TicketVo setDeppland_place(String deppland_place) { this.deppland_place = deppland_place; return this;}
 	
 	public String getArrpland_place() {	return arrpland_place; }
-	public void setArrpland_place(String arrpland_place) { this.arrpland_place = arrpland_place; }
+	public TicketVo setArrpland_place(String arrpland_place) { this.arrpland_place = arrpland_place; return this;}
 	
 	public String getTrain_name() { 
 		return (train_name == null || train_name.length() == 0) ? 
 				"null" : train_name; 
 	}
-	public void setTrain_name(String train_name) { this.train_name = train_name; }
+	public TicketVo setTrain_name(String train_name) { this.train_name = train_name; return this;}
 	
 	public String getCar_number() { 
 		return (car_number == null || car_number.length() == 0) ? "null" : car_number; 
 	}
-	public void setCar_number(String car_number) { this.car_number = car_number; }
+	public TicketVo setCar_number(String car_number) { this.car_number = car_number; return this;}
 	
 	public String getSeat() { 
 		return (seat == null || seat.length() == 0) ? "null" : seat; 
 	}
-	public void setSeat(String seat) { this.seat = seat; }
+	public TicketVo setSeat(String seat) { this.seat = seat; return this;}
 	
 	public String getDeppland_time() { 
 		return deppland_time; 
 	}
-	public void setDeppland_time(String deppland_time) { this.deppland_time = deppland_time; }
+	public TicketVo setDeppland_time(String deppland_time) { this.deppland_time = deppland_time; return this;}
 	
 	public String getArrpland_time() {
 		return arrpland_time;
 	}
-	public void setArrpland_time(String arrpland_time) {
+	public TicketVo setArrpland_time(String arrpland_time) {
 		this.arrpland_time = arrpland_time;
+		return this;
 	}
 	
 	public String getPrice() { return price; }
-	public void setPrice(String price) { this.price = price; }
+	public TicketVo setPrice(String price) { this.price = price; return this;}
 	
 	public String getTicketing_day() { 
 		return ticketing_day; 
 	}
-	public void setTicketing_day(String ticketing_day) { this.ticketing_day = ticketing_day; }
+	public TicketVo setTicketing_day(String ticketing_day) { this.ticketing_day = ticketing_day; return this;}
 	
 	public String getPersonnel() { return personnel; }
-	public void setPersonnel(String personnel) { this.personnel = personnel; }
+	public TicketVo setPersonnel(String personnel) { this.personnel = personnel; return this;}
 	
-	public String getDepTimeDB() {
+	public String getDepTimeByFormat() {
 		return (deppland_time == null || deppland_time.length() == 0) ? 
 				"null" : "to_date('" + deppland_time + "', 'yyyyMMddHH24MI')";
 	}
-	public String getArrTimeDB() {
+	public String getArrTimeByFormat() {
 		return (arrpland_time == null || arrpland_time.length() == 0) ? 
 				"null" : "to_date('" + arrpland_time + "', 'yyyyMMddHH24MI')";
 	}
-	public String getTicketingDayDB() {
+	public String getTicketingDayByFormat() {
 		return (ticketing_day == null || ticketing_day.length() == 0) ? 
 				"null" : "to_date('" + ticketing_day + "', 'yyyyMMddHH24MI')";
 	}

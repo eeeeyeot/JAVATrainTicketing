@@ -49,7 +49,7 @@ public class TicketInformationPanel extends JPanel implements ActionListener{
 		this.parent = parent;
 		sf = new SimpleDateFormat("yyyyMMddHHmm");
 		cal = Calendar.getInstance();
-		TitledBorder titled = new TitledBorder(new LineBorder(Color.black, 2));
+		TitledBorder titled = new TitledBorder(new LineBorder(new Color(47, 48, 61), 2));
 		Font font = new Font("맑은 고딕", Font.BOLD, 17);
 		
 		JPanel northPanel = new JPanel();
@@ -147,7 +147,7 @@ public class TicketInformationPanel extends JPanel implements ActionListener{
 		{
 			TrainDAO dao = TrainDAO.getInstance();
 			dao.deleteReservation(ticket.getTicket_id());
-			((MainMenu)parent).UpdateTicketList();
+			((MainMenu)parent).<TicketVo>updateTicketList(ticket);
 			new NoticeDialog("티켓이 취소되었습니다.", parent);
 		}
 	}

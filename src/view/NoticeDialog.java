@@ -17,12 +17,15 @@ import javax.swing.JLabel;
 
 import util.ScreenUtil;
 import javax.swing.JPanel;
+import java.awt.Color;
 
 @SuppressWarnings("serial")
 public class NoticeDialog extends JDialog {
 
 	public NoticeDialog(String info, Component parent) {
 		super((Frame) parent, "알림", true);
+		setForeground(Color.WHITE);
+		getContentPane().setForeground(Color.WHITE);
 		setSize(250, 150);
 		setLocation(ScreenUtil.getCurrentCenter((Window)parent, this));
 		GridLayout gridLayout = new GridLayout();
@@ -40,6 +43,7 @@ public class NoticeDialog extends JDialog {
 		JButton ok = new JButton("확인");
 		
 		JPanel panel = new JPanel();
+		panel.setForeground(Color.WHITE);
 		panel.setLayout(new FlowLayout());
 		getContentPane().add(panel);
 		panel.add(ok);

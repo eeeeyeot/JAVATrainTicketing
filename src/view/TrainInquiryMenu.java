@@ -55,12 +55,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 	private Queue<ArrayList<TrainVo>> commandQue;
 	private int personnel;
 	
-	@SuppressWarnings("unused")
-	private int childCharge;
-	@SuppressWarnings("unused")
-	private int adultCharge;
-	@SuppressWarnings("unused")
-	private int seniorCharge;
+	private int[] personnelArray;
 	
 	private JFrame parent;
 	
@@ -73,12 +68,13 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 	private JLabel refDepStation;
 	private JLabel refArrStation;
 	private JLabel refPresentlyDate;
+	private JPanel chargeInfoPanel;
 	
 	private JButton[] seatButtons;
+	private JLabel[] chargeLabels;
 	
-//	public static void main(String[] args) {
-//		new TrainInquiry().setVisible(true);
-//	}
+	private TitledBorder panelBorder;
+	private TitledBorder titleBorder;
 	
 	public TrainInquiryMenu() {
 		setTitle("기차 조회");
@@ -86,6 +82,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		setBounds(100, 100, 1000, 700);
 		setResizable(false);
 		contentPane = new JPanel();
+		contentPane.setBackground(Color.WHITE);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		GridBagLayout gbl_contentPane = new GridBagLayout();
@@ -95,9 +92,11 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		gbl_contentPane.rowWeights = new double[]{0.0, 0.0, 1.0, Double.MIN_VALUE};
 		contentPane.setLayout(gbl_contentPane);
 		
-		TitledBorder titled = new TitledBorder(new LineBorder(Color.black, 1));
+		panelBorder = new TitledBorder(new LineBorder(Color.black, 2));
+		titleBorder = new TitledBorder(new LineBorder(Color.LIGHT_GRAY, 1));
 		
 		JPanel titlePanel = new JPanel();
+		titlePanel.setBackground(new Color(176, 196, 222));
 		GridBagConstraints gbc_titlePanel = new GridBagConstraints();
 		gbc_titlePanel.insets = new Insets(0, 0, 5, 0);
 		gbc_titlePanel.fill = GridBagConstraints.BOTH;
@@ -112,6 +111,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		titlePanel.setLayout(gbl_titlePanel);
 		
 		JButton backButton = new JButton("◀ 뒤로");
+		backButton.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
 		GridBagConstraints gbc_backButton = new GridBagConstraints();
 		gbc_backButton.insets = new Insets(0, 0, 0, 5);
 		gbc_backButton.gridx = 0;
@@ -120,13 +120,14 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		backButton.addActionListener(this);
 		
 		JLabel inquiryTitleLabel = new JLabel("열차 조회");
-		inquiryTitleLabel.setFont(new Font("굴림", Font.PLAIN, 20));
+		inquiryTitleLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 20));
 		GridBagConstraints gbc_inquiryTitleLabel = new GridBagConstraints();
 		gbc_inquiryTitleLabel.gridx = 1;
 		gbc_inquiryTitleLabel.gridy = 0;
 		titlePanel.add(inquiryTitleLabel, gbc_inquiryTitleLabel);
 		
 		JPanel stationPanel = new JPanel();
+		stationPanel.setBackground(new Color(176, 196, 222));
 		GridBagConstraints gbc_stationPanel = new GridBagConstraints();
 		gbc_stationPanel.insets = new Insets(0, 0, 5, 0);
 		gbc_stationPanel.fill = GridBagConstraints.BOTH;
@@ -135,17 +136,21 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		contentPane.add(stationPanel, gbc_stationPanel);
 		
 		JLabel depStationLabel = new JLabel("출발역");
+		depStationLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
 		stationPanel.add(depStationLabel);
 		refDepStation = depStationLabel;
 		
 		JLabel arrowLabel = new JLabel(" → ");
+		arrowLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
 		stationPanel.add(arrowLabel);
 		
 		JLabel arrStationLabel = new JLabel("도착역");
+		arrStationLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
 		stationPanel.add(arrStationLabel);
 		refArrStation = arrStationLabel;
 		
 		JLayeredPane layeredPane = new JLayeredPane();
+		layeredPane.setBackground(Color.WHITE);
 		GridBagConstraints gbc_layeredPane = new GridBagConstraints();
 		gbc_layeredPane.fill = GridBagConstraints.BOTH;
 		gbc_layeredPane.gridx = 0;
@@ -159,6 +164,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		layeredPane.setLayout(gbl_layeredPane);
 		
 		JPanel selectTrainPanel = new JPanel();
+		selectTrainPanel.setBackground(Color.WHITE);
 		layeredPane.setLayer(selectTrainPanel, 2);
 		GridBagConstraints gbc_selectTrainPanel = new GridBagConstraints();
 		gbc_selectTrainPanel.fill = GridBagConstraints.BOTH;
@@ -171,45 +177,33 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		gbl_selectTrainPanel.columnWeights = new double[]{0.0, Double.MIN_VALUE};
 		gbl_selectTrainPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
 		selectTrainPanel.setLayout(gbl_selectTrainPanel);
-		selectTrainPanel.setBorder(titled);
+		selectTrainPanel.setBorder(panelBorder);
 		
 		JPanel datePanel = new JPanel();
+		datePanel.setBackground(Color.WHITE);
 		GridBagConstraints gbc_datePanel = new GridBagConstraints();
 		gbc_datePanel.fill = GridBagConstraints.HORIZONTAL;
-		gbc_datePanel.insets = new Insets(0, 0, 5, 0);
+		gbc_datePanel.insets = new Insets(0, 0, 0, 0);
 		gbc_datePanel.gridx = 0;
 		gbc_datePanel.gridy = 0;
 		selectTrainPanel.add(datePanel, gbc_datePanel);
 		GridBagLayout gbl_datePanel = new GridBagLayout();
-		gbl_datePanel.columnWidths = new int[]{364, 73, 92, 73, 0};
+		gbl_datePanel.columnWidths = new int[]{92, 0};
 		gbl_datePanel.rowHeights = new int[]{23, 0};
-		gbl_datePanel.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_datePanel.columnWeights = new double[]{1.0, Double.MIN_VALUE};
 		gbl_datePanel.rowWeights = new double[]{0.0, Double.MIN_VALUE};
 		datePanel.setLayout(gbl_datePanel);
-		
-		JButton previousDayButton = new JButton("이전 날");
-		GridBagConstraints gbc_previousDayButton = new GridBagConstraints();
-		gbc_previousDayButton.anchor = GridBagConstraints.NORTHWEST;
-		gbc_previousDayButton.insets = new Insets(0, 0, 0, 5);
-		gbc_previousDayButton.gridx = 1;
-		gbc_previousDayButton.gridy = 0;
-		datePanel.add(previousDayButton, gbc_previousDayButton);
+		datePanel.setBorder(titleBorder);
 		
 		JLabel presentlyDateLabel = new JLabel("2020년 00월 00일");
+		presentlyDateLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		presentlyDateLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
 		GridBagConstraints gbc_presentlyDateLabel = new GridBagConstraints();
-		gbc_presentlyDateLabel.anchor = GridBagConstraints.WEST;
-		gbc_presentlyDateLabel.insets = new Insets(0, 0, 0, 5);
-		gbc_presentlyDateLabel.gridx = 2;
+		gbc_presentlyDateLabel.fill = GridBagConstraints.HORIZONTAL;
+		gbc_presentlyDateLabel.gridx = 0;
 		gbc_presentlyDateLabel.gridy = 0;
 		datePanel.add(presentlyDateLabel, gbc_presentlyDateLabel);
 		refPresentlyDate = presentlyDateLabel;
-		
-		JButton nextDayButton = new JButton("다음 날");
-		GridBagConstraints gbc_nextDayButton = new GridBagConstraints();
-		gbc_nextDayButton.anchor = GridBagConstraints.NORTHWEST;
-		gbc_nextDayButton.gridx = 3;
-		gbc_nextDayButton.gridy = 0;
-		datePanel.add(nextDayButton, gbc_nextDayButton);
 		
 		JComboBox<String> trainCategoryBox = new JComboBox<String>();
 		GridBagConstraints gbc_trainCategoryBox = new GridBagConstraints();
@@ -220,6 +214,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		selectTrainPanel.add(trainCategoryBox, gbc_trainCategoryBox);
 		
 		JPanel subTitlePanel = new JPanel();
+		subTitlePanel.setBackground(new Color(240, 255, 255));
 		GridBagConstraints gbc_subTitlePanel = new GridBagConstraints();
 		gbc_subTitlePanel.fill = GridBagConstraints.BOTH;
 		gbc_subTitlePanel.insets = new Insets(0, 0, 5, 0);
@@ -227,15 +222,15 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		gbc_subTitlePanel.gridy = 2;
 		selectTrainPanel.add(subTitlePanel, gbc_subTitlePanel);
 		GridBagLayout gbl_subTitlePanel = new GridBagLayout();
-		gbl_subTitlePanel.columnWidths = new int[]{200, 50, 200, 50, 200, 50, 200, 0};
 		gbl_subTitlePanel.rowHeights = new int[]{15, 0};
-		gbl_subTitlePanel.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_subTitlePanel.columnWeights = new double[]{1.0, 1.0, 1.0, 1.0, 1.0};
 		gbl_subTitlePanel.rowWeights = new double[]{0.0, Double.MIN_VALUE};
 		subTitlePanel.setLayout(gbl_subTitlePanel);
+		subTitlePanel.setBorder(titleBorder);
 		
 		JLabel subTitleTrain = new JLabel("열차");
 		subTitleTrain.setHorizontalAlignment(SwingConstants.CENTER);
-		subTitleTrain.setFont(new Font("굴림", Font.PLAIN, 18));
+		subTitleTrain.setFont(new Font("맑은 고딕", Font.PLAIN, 18));
 		GridBagConstraints gbc_subTitleTrain = new GridBagConstraints();
 		gbc_subTitleTrain.anchor = GridBagConstraints.NORTH;
 		gbc_subTitleTrain.insets = new Insets(0, 0, 0, 5);
@@ -245,34 +240,46 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		
 		JLabel subTitleDepplandTime = new JLabel("출발");
 		subTitleDepplandTime.setHorizontalAlignment(SwingConstants.CENTER);
-		subTitleDepplandTime.setFont(new Font("굴림", Font.PLAIN, 18));
+		subTitleDepplandTime.setFont(new Font("맑은 고딕", Font.PLAIN, 18));
 		GridBagConstraints gbc_subTitleDepplandTime = new GridBagConstraints();
 		gbc_subTitleDepplandTime.anchor = GridBagConstraints.NORTH;
 		gbc_subTitleDepplandTime.insets = new Insets(0, 0, 0, 5);
-		gbc_subTitleDepplandTime.gridx = 2;
+		gbc_subTitleDepplandTime.gridx = 1;
 		gbc_subTitleDepplandTime.gridy = 0;
 		subTitlePanel.add(subTitleDepplandTime, gbc_subTitleDepplandTime);
 		
 		JLabel subTitleArrplandTime = new JLabel("도착");
 		subTitleArrplandTime.setHorizontalAlignment(SwingConstants.CENTER);
-		subTitleArrplandTime.setFont(new Font("굴림", Font.PLAIN, 18));
+		subTitleArrplandTime.setFont(new Font("맑은 고딕", Font.PLAIN, 18));
 		GridBagConstraints gbc_subTitleArrplandTime = new GridBagConstraints();
 		gbc_subTitleArrplandTime.anchor = GridBagConstraints.NORTH;
 		gbc_subTitleArrplandTime.insets = new Insets(0, 0, 0, 5);
-		gbc_subTitleArrplandTime.gridx = 4;
+		gbc_subTitleArrplandTime.gridx = 2;
 		gbc_subTitleArrplandTime.gridy = 0;
 		subTitlePanel.add(subTitleArrplandTime, gbc_subTitleArrplandTime);
 		
+		JLabel subTitleSeats = new JLabel("좌석");
+		subTitleSeats.setHorizontalAlignment(SwingConstants.CENTER);
+		subTitleSeats.setFont(new Font("맑은 고딕", Font.PLAIN, 18));
+		GridBagConstraints gbc_subTitleSeats = new GridBagConstraints();
+		gbc_subTitleSeats.anchor = GridBagConstraints.NORTH;
+		gbc_subTitleSeats.insets = new Insets(0, 0, 0, 5);
+		gbc_subTitleSeats.gridx = 3;
+		gbc_subTitleSeats.gridy = 0;
+		subTitlePanel.add(subTitleSeats, gbc_subTitleSeats);
+		
 		JLabel subTitlePrice = new JLabel("가격");
 		subTitlePrice.setHorizontalAlignment(SwingConstants.CENTER);
-		subTitlePrice.setFont(new Font("굴림", Font.PLAIN, 18));
+		subTitlePrice.setFont(new Font("맑은 고딕", Font.PLAIN, 18));
 		GridBagConstraints gbc_subTitlePrice = new GridBagConstraints();
+		gbc_subTitlePrice.insets = new Insets(0, 0, 0, 5);
 		gbc_subTitlePrice.anchor = GridBagConstraints.NORTH;
-		gbc_subTitlePrice.gridx = 6;
+		gbc_subTitlePrice.gridx = 4;
 		gbc_subTitlePrice.gridy = 0;
 		subTitlePanel.add(subTitlePrice, gbc_subTitlePrice);
 		
 		trainListPanel = new JPanel();
+		trainListPanel.setBackground(Color.WHITE);
 		JScrollPane trainListScrollPane = new JScrollPane(trainListPanel);
 		GridBagLayout gbl_trainInfomationsPanel = new GridBagLayout();
 		gbl_trainInfomationsPanel.columnWidths = new int[]{0};
@@ -288,6 +295,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		trainListScrollPane.getVerticalScrollBar().setUnitIncrement(16);
 		
 		JPanel selectSeatPanel = new JPanel();
+		selectSeatPanel.setBackground(Color.WHITE);
 		layeredPane.setLayer(selectSeatPanel, 1);
 		GridBagConstraints gbc_selectSeatPanel = new GridBagConstraints();
 		gbc_selectSeatPanel.fill = GridBagConstraints.BOTH;
@@ -301,7 +309,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		gbl_selectSeatPanel.rowWeights = new double[]{0.0, 0.0, 1.0, Double.MIN_VALUE};
 		selectSeatPanel.setLayout(gbl_selectSeatPanel);
 		
-		JPanel chargeInfoPanel = new JPanel();
+		chargeInfoPanel = new JPanel();
 		GridBagConstraints gbc_chargeInfoPanel = new GridBagConstraints();
 		gbc_chargeInfoPanel.fill = GridBagConstraints.BOTH;
 		gbc_chargeInfoPanel.insets = new Insets(0, 0, 5, 0);
@@ -318,7 +326,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		gbc_seatInfoPanel.gridy = 1;
 		selectSeatPanel.add(seatInfoPanel, gbc_seatInfoPanel);
 		seatInfoPanel.setLayout(new BorderLayout(0, 0));
-		seatInfoPanel.setBorder(titled);
+		seatInfoPanel.setBorder(panelBorder);
 		
 		JLabel lblNewLabel = new JLabel("기차 앞");
 		lblNewLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
@@ -386,36 +394,34 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 			}
 		}
 		
-		
-		JLabel[] labels = new JLabel[9];
+		chargeLabels = new JLabel[9];
 		String seatType = "요금";
 		String[] byAge = { "어린이", "어른", "경로" };
-		String[] prices = { "1,300", "2,600", "1,300" };
 		JPanel[] chargePanels = new JPanel[3];
 		
-		for(int i = 0; i < labels.length; i++) 
+		for(int i = 0; i < chargeLabels.length; i++) 
 		{
 			switch(i % 3) 
 			{
 			case 0:
-				labels[i] = new JLabel(byAge[i/3]);
+				chargeLabels[i] = new JLabel(byAge[i/3]);
 				chargePanels[i / 3] = new JPanel(new GridLayout(0, 3));
 				break;
 			case 1:
-				labels[i] = new JLabel(seatType);
+				chargeLabels[i] = new JLabel(seatType);
 				break;
 			case 2:
-				labels[i] = new JLabel(prices[i/3]);
+				chargeLabels[i] = new JLabel();
 				break;
 			}
-			labels[i].setFont(new Font("맑은 고딕", Font.BOLD, 16));
-			labels[i].setHorizontalAlignment(SwingConstants.CENTER);
-			chargePanels[i / 3].add(labels[i]);
+			chargeLabels[i].setFont(new Font("맑은 고딕", Font.BOLD, 16));
+			chargeLabels[i].setHorizontalAlignment(SwingConstants.CENTER);
+			chargePanels[i / 3].add(chargeLabels[i]);
 		}
 		
 		for(int i = 0; i < chargePanels.length; i++) {
 			chargeInfoPanel.add(chargePanels[i]);
-			chargePanels[i].setBorder(titled);
+			chargePanels[i].setBorder(panelBorder);
 		}
 		
 		Vector<String> trainKindList = TrainAPI.getInstance().getTrainKind();
@@ -430,10 +436,16 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		setLocation(ScreenUtil.getCenterPosition(this));
 	}
 	
-	public TrainInquiryMenu(Queue<ArrayList<TrainVo>> commands, JFrame parent, int personnel) {
+	public TrainInquiryMenu(Queue<ArrayList<TrainVo>> commands, JFrame parent, int[] personnel) {
 		this();
 		this.parent = parent;
-		this.personnel = personnel;
+		this.personnelArray = personnel;
+		
+		if(personnel == null)
+			this.personnel = 1;
+		else
+			for(int i : personnel)
+				this.personnel += i;
 		
 		System.out.println("first command size : " + commands.size());
 		
@@ -444,8 +456,8 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		
 		updateTrainList(trainList, "모두");
 		
-		System.out.println("인원 : " + personnel);
-		seatList = new ArrayList<Integer>(personnel);
+		System.out.println("인원 : " + this.personnel);
+		seatList = new ArrayList<Integer>(this.personnel);
 		
 		commandQue = new LinkedList<ArrayList<TrainVo>>();
 		for(int i = 0; i < commands.size(); i++) {
@@ -455,21 +467,15 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		System.out.println("remain command length : " + commandQue.size());
 	}
 	
-	public TrainInquiryMenu setPersonnel(int personnel) {
-		this.personnel = personnel;
-		return this;
-	}
-	public TrainInquiryMenu setChildCount(int childCount) {
-		this.childCharge = childCount * currentTrainVo.getFee();
-		return this;
-	}
-	public TrainInquiryMenu setAdultCount(int personnel) {
-		this.personnel = personnel;
-		return this;
-	}
-	public TrainInquiryMenu setSeniorCount(int personnel) {
-		this.personnel = personnel;
-		return this;
+	public void setCharge(int[] charge) 
+	{
+		for(int i = 0; i < chargeLabels.length; i++) 
+		{
+			if(i % 3 == 2) {  
+				chargeLabels[i].setText(String.format("%d", charge[i/3]));
+			}
+		}
+		
 	}
 	
 	public void addCommand(ArrayList<TrainVo> command) {
@@ -564,6 +570,8 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		for(TrainVo vo : list) {
 			if(type.equals(vo.getTrainName()) || type.equals("모두")) {
 				TrainInformationPanel ti = new TrainInformationPanel(vo, this);
+				ti.setChargeButtonText(personnelArray);
+				
 				if(!ti.hasEmptySeat(personnel)) {
 					ti.setEnabled(false);
 				}
@@ -599,6 +607,10 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		trainListPanel.updateUI();
 
 		System.out.println(type + " 열차 정보 수 : " + cnt);
+	}
+	
+	public void setCurrentTrainVo(TrainVo currentTrainVo) {
+		this.currentTrainVo = currentTrainVo;
 	}
 	
 	private String getDateString(String str_date) {
@@ -709,18 +721,17 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		((MainMenu)parent).addReservation(ticket.getTicket_id());
 		if(currentTrainVo == null)
 			System.out.println("currentVo is null");
-		String tmpPrice = "1000";
 		
 		ticket.setDeppland_place(currentTrainVo.getDepPlace())
-		.setArrpland_place(currentTrainVo.getArrPlace())
-		.setTrain_name(currentTrainVo.getTrainName())
-		.setCar_number(currentTrainVo.getCarNumber())
-		.setPersonnel(String.format("%d", personnel))
-		.setSeat(getSeatString())
-		.setDeppland_time(currentTrainVo.getDepplandTime())
-		.setArrpland_time(currentTrainVo.getArrplandTime())
-		.setPrice(tmpPrice)
-		.setTicketing_day(Constants.getTodayTimeToString());
+			.setArrpland_place(currentTrainVo.getArrPlace())
+			.setTrain_name(currentTrainVo.getTrainName())
+			.setCar_number(currentTrainVo.getCarNumber())
+			.setPersonnel(String.format("%d", personnel))
+			.setSeat(getSeatString())
+			.setDeppland_time(currentTrainVo.getDepplandTime())
+			.setArrpland_time(currentTrainVo.getArrplandTime())
+			.setPrice(String.format("%d", currentTrainVo.getFee()))
+			.setTicketing_day(Constants.getTodayTimeToString());
 		
 		dao.insertTicketData(ticket);
 		
@@ -771,10 +782,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		
 		return sb.toString().trim();
 	}
-	
-	public void setCurrentTrainVo(TrainVo currentTrainVo) {
-		this.currentTrainVo = currentTrainVo;
-	}
+
 }
 
 

@@ -2,6 +2,8 @@ package database;
 
 public class TicketVo {
 	
+	private static TicketVo instance = null;
+	
 	private String ticket_id;		//not null	number
 	private String deppland_place;	//not null	varchar
 	private String arrpland_place;	//not null	varchar
@@ -14,9 +16,14 @@ public class TicketVo {
 	private String price;			//not null	int
 	private String ticketing_day;	//not null	Date
 	
-	public TicketVo() {
+	public static TicketVo getInstance() {
+		if(instance == null)
+			instance = new TicketVo();
 		
+		return instance;
 	}
+	
+	public TicketVo() {	}
 	
 	public TicketVo(TrainDAO dao) {
 		int lastID;

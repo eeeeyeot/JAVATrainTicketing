@@ -24,7 +24,7 @@ CREATE TABLE RESERVATION_SEASON
 	CONSTRAINT pk_reservation_season PRIMARY KEY (season_id),
 	CONSTRAINT fk_reservation_season FOREIGN KEY (user_id) 
 	REFERENCES userdata (user_id)
-)
+);
 
 CREATE TABLE Ticket (
 	ticket_id		number(10) NOT NULL,
@@ -51,7 +51,7 @@ CREATE TABLE SEASON_Ticket (
 	expiration_date	DATE NOT NULL,
 	CONSTRAINT fk_season FOREIGN KEY (season_id)
 	REFERENCES reservation_season (season_id)
-)
+);
 
 CREATE TABLE fare
 (

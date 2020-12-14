@@ -3,6 +3,7 @@ package view_component;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -15,6 +16,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -24,7 +27,10 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import constants.Constants;
+import main.Main;
+
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.BorderLayout;
 
 @SuppressWarnings("serial")
@@ -34,6 +40,7 @@ public class SelectDatePanel extends JPanel {
 	private JTextField dayTextField;
 	
 	public SelectDatePanel(String type) {
+		setBackground(new Color(240, 255, 255));
 		String title;
 		if(type.equals("oneway"))
 			title = "출 발 일";
@@ -46,22 +53,26 @@ public class SelectDatePanel extends JPanel {
 		else
 			title = "something wrong";
 		
-		TitledBorder titled = new TitledBorder(new LineBorder(Color.LIGHT_GRAY, 2));
-		setBorder(titled);
+		TitledBorder panelBorder = new TitledBorder(new LineBorder(Color.BLACK, 2));
+		TitledBorder titleBorder = new TitledBorder(new LineBorder(Color.LIGHT_GRAY, 1));
+		setBorder(panelBorder);
 		setLayout(new BorderLayout(0, 0));
 		
 		JLabel dateLabel = new JLabel(title);
+		dateLabel.setBackground(new Color(240, 255, 255));
 		dateLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		dateLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 20));
 		add(dateLabel, BorderLayout.NORTH);
-		dateLabel.setBorder(titled);
+		dateLabel.setBorder(titleBorder);
 		
 		JPanel detailDatePanel = new JPanel();
+		detailDatePanel.setBackground(Color.WHITE);
 		add(detailDatePanel);
 		detailDatePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-		detailDatePanel.setBorder(titled);
+		detailDatePanel.setBorder(titleBorder);
 		
 		JPanel yearSelectPanel = new JPanel();
+		yearSelectPanel.setBackground(Color.WHITE);
 		detailDatePanel.add(yearSelectPanel);
 		GridBagLayout gbl_yearSelectPanel = new GridBagLayout();
 		gbl_yearSelectPanel.columnWidths = new int[] {30, 39, 80, 39, 30, 0};
@@ -71,7 +82,8 @@ public class SelectDatePanel extends JPanel {
 		yearSelectPanel.setLayout(gbl_yearSelectPanel);
 		
 		JButton decreaseYearButton = new JButton("-");
-
+		decreaseYearButton.setFont(new Font("굴림", Font.PLAIN, 14));
+		decreaseYearButton.setBackground(Constants.BUTTON_COLOR);
 		GridBagConstraints gbc_decreaseYearButton = new GridBagConstraints();
 		gbc_decreaseYearButton.fill = GridBagConstraints.HORIZONTAL;
 		gbc_decreaseYearButton.insets = new Insets(0, 0, 0, 5);
@@ -89,6 +101,8 @@ public class SelectDatePanel extends JPanel {
 		yearSelectPanel.add(yearTextField, gbc_TextField);
 
 		JButton increaseYearButton = new JButton("+");
+		increaseYearButton.setFont(new Font("굴림", Font.PLAIN, 14));
+		increaseYearButton.setBackground(Constants.BUTTON_COLOR);
 		GridBagConstraints gbc_increaseYearButton = new GridBagConstraints();
 		gbc_increaseYearButton.insets = new Insets(0, 0, 0, 5);
 		gbc_increaseYearButton.fill = GridBagConstraints.HORIZONTAL;
@@ -103,6 +117,7 @@ public class SelectDatePanel extends JPanel {
 		yearSelectPanel.add(yearLabel, gbc_yearLabel);
 
 		JPanel monthSelectPanel = new JPanel();
+		monthSelectPanel.setBackground(Color.WHITE);
 		detailDatePanel.add(monthSelectPanel);
 		GridBagLayout gbl_monthSelectPanel = new GridBagLayout();
 		gbl_monthSelectPanel.columnWidths = new int[] {30, 39, 80, 39, 30, 0};
@@ -112,6 +127,8 @@ public class SelectDatePanel extends JPanel {
 		monthSelectPanel.setLayout(gbl_monthSelectPanel);
 
 		JButton decreaseMonthButton = new JButton("-");
+		decreaseMonthButton.setFont(new Font("굴림", Font.PLAIN, 14));
+		decreaseMonthButton.setBackground(Constants.BUTTON_COLOR);
 		GridBagConstraints gbc_decreaseMonthButton = new GridBagConstraints();
 		gbc_decreaseMonthButton.anchor = GridBagConstraints.WEST;
 		gbc_decreaseMonthButton.insets = new Insets(0, 0, 0, 5);
@@ -129,6 +146,8 @@ public class SelectDatePanel extends JPanel {
 		monthSelectPanel.add(monthTextField, gbc_TextField_1);
 
 		JButton increaseMonthButton = new JButton("+");
+		increaseMonthButton.setFont(new Font("굴림", Font.PLAIN, 14));
+		increaseMonthButton.setBackground(Constants.BUTTON_COLOR);
 		GridBagConstraints gbc_increaseMonthButton = new GridBagConstraints();
 		gbc_increaseMonthButton.insets = new Insets(0, 0, 0, 5);
 		gbc_increaseMonthButton.anchor = GridBagConstraints.WEST;
@@ -143,6 +162,7 @@ public class SelectDatePanel extends JPanel {
 		monthSelectPanel.add(monthLabel, gbc_monthLabel);
 
 		JPanel daySelectPanel = new JPanel();
+		daySelectPanel.setBackground(Color.WHITE);
 		detailDatePanel.add(daySelectPanel);
 		GridBagLayout gbl_daySelectPanel = new GridBagLayout();
 		gbl_daySelectPanel.columnWidths = new int[] {30, 39, 80, 39, 30, 0};
@@ -152,6 +172,8 @@ public class SelectDatePanel extends JPanel {
 		daySelectPanel.setLayout(gbl_daySelectPanel);
 
 		JButton decreaseDayButton = new JButton("-");
+		decreaseDayButton.setFont(new Font("굴림", Font.PLAIN, 14));
+		decreaseDayButton.setBackground(Constants.BUTTON_COLOR);
 		GridBagConstraints gbc_decreaseDayButton = new GridBagConstraints();
 		gbc_decreaseDayButton.anchor = GridBagConstraints.WEST;
 		gbc_decreaseDayButton.insets = new Insets(0, 0, 0, 5);
@@ -171,6 +193,8 @@ public class SelectDatePanel extends JPanel {
 		initializeDate(yearTextField, monthTextField, dayTextField);
 
 		JButton increaseDayButton = new JButton("+");
+		increaseDayButton.setFont(new Font("굴림", Font.PLAIN, 14));
+		increaseDayButton.setBackground(Constants.BUTTON_COLOR);
 		GridBagConstraints gbc_increaseDayButton = new GridBagConstraints();
 		gbc_increaseDayButton.insets = new Insets(0, 0, 0, 5);
 		gbc_increaseDayButton.anchor = GridBagConstraints.WEST;
@@ -225,6 +249,7 @@ public class SelectDatePanel extends JPanel {
 		decreaseYearButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				decreaseDate(yearTextField);
+				System.out.println(decreaseYearButton.getSize());
 			}
 		});
 
@@ -241,6 +266,7 @@ public class SelectDatePanel extends JPanel {
 		increaseYearButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				increaseDate(yearTextField, yearTextField.getText(), null, false);
+				System.out.println(increaseYearButton.getSize());
 			}
 		});
 	}

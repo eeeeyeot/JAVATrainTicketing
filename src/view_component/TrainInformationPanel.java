@@ -18,12 +18,16 @@ import java.awt.Color;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+import constants.Constants;
 import database.TrainDAO;
 import openAPI.*;
 import view.TrainInquiryMenu;
 
 @SuppressWarnings("serial")
 public class TrainInformationPanel extends JPanel implements ActionListener{
+	public final int[] overKTX = {4000, 6000, 5000};
+	public final int[] underKTX = {2300, 3600, 2800};
+	
 	private JLabel trainIdentityLabel;
 	private JLabel depplandTimeLabel;
 	private JLabel arrplandTimeLabel;
@@ -34,9 +38,10 @@ public class TrainInformationPanel extends JPanel implements ActionListener{
 	private TrainDAO dao;
 	private TrainVo vo;
 	
-	int emptySeat;
+	private int emptySeat;
 	
 	public TrainInformationPanel() {
+		setBackground(Color.WHITE);
 		setForeground(Color.BLACK);
 		setBorder(null);
 		setLayout(new GridLayout(1, 4, 0, 0));
@@ -64,6 +69,7 @@ public class TrainInformationPanel extends JPanel implements ActionListener{
 		add(personnelLabel);
 		
 		priceButton = new JButton("1,000원");
+		priceButton.setBackground(new Color(135, 206, 250));
 		priceButton.setFont(font);
 		add(priceButton);
 		
@@ -105,14 +111,7 @@ public class TrainInformationPanel extends JPanel implements ActionListener{
 		
 		return sb.toString();
 	}
-	
-	public void actionPerformed(ActionEvent e) {
-		//선택된 TrainVo를 가져와야함
-		parent.setLayer(TrainInquiryMenu.HIDE);
-		parent.setCurrentTrainVo(vo);
-		parent.updateSeatButton(vo);
-	}
-	
+
 	public boolean hasEmptySeat(int personnel) {
 		if(personnel <= emptySeat)
 			return true;
@@ -123,29 +122,38 @@ public class TrainInformationPanel extends JPanel implements ActionListener{
 	public void setEnabled(boolean enabled) {
 		this.setBackground(Color.LIGHT_GRAY);
 	}
+	
+	public void actionPerformed(ActionEvent e) {
+		//선택된 TrainVo를 가져와야함
+		parent.setLayer(TrainInquiryMenu.HIDE);
+		parent.setCurrentTrainVo(vo);
+		parent.updateSeatButton(vo);
+		if(vo.getTrainName().contains("KTX"))
+			parent.setCharge(overKTX);
+		else
+			parent.setCharge(underKTX);
+	}
+	
+	public void setChargeButtonText(int[] personnel) {
+		StringBuilder charge = new StringBuilder();
+		if(personnel == null) {
+			charge.append("정기권 (무료)");
+			vo.setFee(0);
+		}
+		else {
+			int total = 0;
+			if (vo.getTrainName().contains("KTX")) {
+				for (int i = 0; i < personnel.length; i++) {
+					total += overKTX[i] * personnel[i];
+				}
+			} else {
+				for (int i = 0; i < personnel.length; i++) {
+					total += underKTX[i] * personnel[i];
+				}
+			}
+			vo.setFee(total);
+			charge.append(Constants.dFormatter.format(total)).append("원");
+		}
+		priceButton.setText(charge.toString());
+	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

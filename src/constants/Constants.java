@@ -1,6 +1,8 @@
 package constants;
 
+import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -10,6 +12,10 @@ public class Constants {
 	public static final String ONE_WAY = "10";
 	public static final String ROUND_TRIP = "20";
 	public static final String[] DAY_OF_WEEK = { "일" , "월", "화", "수", "목", "금", "토" };
+	
+	public static final Color BUTTON_COLOR = new Color(0x99, 0xCC, 0xFF); 
+	
+	public static DecimalFormat dFormatter = new DecimalFormat("#,###");
 	
 	private static Calendar cal = Calendar.getInstance();
 	

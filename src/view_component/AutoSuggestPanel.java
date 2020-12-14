@@ -70,6 +70,7 @@ public class AutoSuggestPanel extends JPanel{
 	}
 	
 	public String getComboBoxText() {
+		System.out.println("getComboBoxText : " + tf.getText());
 		return tf.getText();
 	}
 	

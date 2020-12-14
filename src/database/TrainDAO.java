@@ -124,7 +124,7 @@ public class TrainDAO
 				}
 				
 				TicketVo vo = new TicketVo()
-						.setTicket_id("TICKET_ID")
+						.setTicket_id(rs.getString("TICKET_ID"))
 						.setDeppland_place(rs.getString("DEPPLAND_PLACE"))
 						.setArrpland_place(rs.getString("ARRPLAND_PLACE"))
 						.setTrain_name(rs.getString("TRAIN_NAME"))
@@ -172,8 +172,6 @@ public class TrainDAO
 						.setTerm(Integer.parseInt(rs.getString("TERM")))
 						.setEffDate(getDateToString(rs.getString("EFFECTIVE_DATE")))
 						.setExpDate(getDateToString(rs.getString("EXPIRATION_DATE")));
-				
-				System.out.println(vo);
 				
 				list.add(vo);
 			}

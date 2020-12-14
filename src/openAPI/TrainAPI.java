@@ -114,7 +114,7 @@ public class TrainAPI
 				
 				while(iter.hasNext()) {
 					TrainVo vo = iter.next();
-					System.out.println(vo.toString());
+					System.out.println(vo.toString() + " - TrainAPI");
 					if(Constants.getTodayTimeToString().compareTo(vo.getDepplandTime()) > 0) {
 						iter.remove();
 						continue;
@@ -283,7 +283,6 @@ public class TrainAPI
 
 				//파싱할 tag
 				NodeList			nList	= doc.getElementsByTagName("item");
-				//System.out.println("파싱할 리스트 수 : " + nList.getLength());
 				SimpleDateFormat	fm		= new SimpleDateFormat("yyyyMMddHHmmss");
 				for (int i = 0; i < nList.getLength(); i++)
 				{

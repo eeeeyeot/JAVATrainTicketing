@@ -47,14 +47,15 @@ public class TicketViewMenu extends JFrame {
 		setBounds(100, 100, 600, 400);
 		setLocation(ScreenUtil.getCenterPosition(this));
 		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setBorder(new EmptyBorder(0, 0, 0, 0));
 		setContentPane(contentPane);
 		GridBagLayout gbl_contentPane = new GridBagLayout();
 		gbl_contentPane.columnWidths = new int[]{0, 0};
-		gbl_contentPane.rowHeights = new int[]{32, 0, 0, 0, 0, 0, 0};
+		gbl_contentPane.rowHeights = new int[]{32, 0, 0, 0, 0, 0};
 		gbl_contentPane.columnWeights = new double[]{1.0, Double.MIN_VALUE};
-		gbl_contentPane.rowWeights = new double[]{1.0, 1.0, 1.0, 1.0, 1.0, 0.0, Double.MIN_VALUE};
+		gbl_contentPane.rowWeights = new double[]{1.0, 1.0, 1.0, 1.0, 0.0, Double.MIN_VALUE};
 		contentPane.setLayout(gbl_contentPane);
+		contentPane.setBackground(new Color(176, 196, 222));
 		
 		titled = new TitledBorder(new LineBorder(Color.black, 2));
 		
@@ -65,6 +66,7 @@ public class TicketViewMenu extends JFrame {
 		});
 		
 		JPanel titlePanel = new JPanel();
+		//titlePanel.setBackground(new Color(192, 192, 192));
 		GridBagConstraints gbc_titlePanel = new GridBagConstraints();
 		gbc_titlePanel.insets = new Insets(0, 0, 5, 0);
 		gbc_titlePanel.fill = GridBagConstraints.BOTH;
@@ -72,14 +74,16 @@ public class TicketViewMenu extends JFrame {
 		gbc_titlePanel.gridy = 0;
 		contentPane.add(titlePanel, gbc_titlePanel);
 		titlePanel.setLayout(new GridLayout(0, 1, 0, 0));
+		//titlePanel.setBorder(new TitledBorder(new LineBorder(new Color(153, 153, 255), 2)));
 		
 		JLabel titleLabel = new JLabel("승차권");
 		titleLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 20));
 		titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		titlePanel.add(titleLabel);
-		titleLabel.setBorder(titled);
+		
 		
 		JPanel datePanel = new JPanel();
+		datePanel.setBackground(Color.WHITE);
 		GridBagConstraints gbc_datePanel = new GridBagConstraints();
 		gbc_datePanel.insets = new Insets(0, 0, 5, 0);
 		gbc_datePanel.fill = GridBagConstraints.BOTH;
@@ -87,14 +91,16 @@ public class TicketViewMenu extends JFrame {
 		gbc_datePanel.gridy = 1;
 		contentPane.add(datePanel, gbc_datePanel);
 		datePanel.setLayout(new GridLayout(0, 1, 0, 0));
+		datePanel.setBorder(titled);
 		
 		reservationDateLabel = new JLabel("2020년 00월 00일 (월)");
+		reservationDateLabel.setBackground(Color.WHITE);
 		reservationDateLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		reservationDateLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 20));
 		datePanel.add(reservationDateLabel);
-		reservationDateLabel.setBorder(titled);
 		
 		JPanel depArrPanel = new JPanel();
+		depArrPanel.setBackground(new Color(176, 196, 222));
 		GridBagConstraints gbc_depArrPanel = new GridBagConstraints();
 		gbc_depArrPanel.insets = new Insets(0, 0, 5, 0);
 		gbc_depArrPanel.fill = GridBagConstraints.BOTH;
@@ -109,6 +115,7 @@ public class TicketViewMenu extends JFrame {
 		depArrPanel.setLayout(gbl_depArrPanel);
 		
 		JPanel depPlacePanel = new JPanel();
+		depPlacePanel.setBackground(Color.WHITE);
 		GridBagConstraints gbc_depPlacePanel = new GridBagConstraints();
 		gbc_depPlacePanel.insets = new Insets(0, 0, 5, 0);
 		gbc_depPlacePanel.fill = GridBagConstraints.BOTH;
@@ -154,6 +161,7 @@ public class TicketViewMenu extends JFrame {
 		depPlacePanel.add(arrPlandPlace, gbc_arrPlandPlace);
 		
 		JPanel arrPlacePanel = new JPanel();
+		arrPlacePanel.setBackground(Color.WHITE);
 		GridBagConstraints gbc_arrPlacePanel = new GridBagConstraints();
 		gbc_arrPlacePanel.fill = GridBagConstraints.BOTH;
 		gbc_arrPlacePanel.gridx = 0;
@@ -188,6 +196,7 @@ public class TicketViewMenu extends JFrame {
 		arrPlacePanel.add(arrPlandTime, gbc_arrPlandTime);
 		
 		JPanel trainInfoPanel = new JPanel();
+		trainInfoPanel.setBackground(Color.WHITE);
 		GridBagConstraints gbc_trainInfoPanel = new GridBagConstraints();
 		gbc_trainInfoPanel.insets = new Insets(0, 0, 5, 0);
 		gbc_trainInfoPanel.fill = GridBagConstraints.BOTH;
@@ -203,8 +212,8 @@ public class TicketViewMenu extends JFrame {
 		trainInfoPanel.add(trainInfoLabel);
 		
 		JPanel reservationInfoPanel = new JPanel();
+		reservationInfoPanel.setBackground(Color.WHITE);
 		GridBagConstraints gbc_reservationInfoPanel = new GridBagConstraints();
-		gbc_reservationInfoPanel.insets = new Insets(0, 0, 5, 0);
 		gbc_reservationInfoPanel.fill = GridBagConstraints.BOTH;
 		gbc_reservationInfoPanel.gridx = 0;
 		gbc_reservationInfoPanel.gridy = 4;
@@ -212,6 +221,7 @@ public class TicketViewMenu extends JFrame {
 		reservationInfoPanel.setLayout(new GridLayout(0, 1, 0, 0));
 		
 		JPanel reservationGridPanel = new JPanel();
+		reservationGridPanel.setBackground(new Color(176, 196, 222));
 		reservationInfoPanel.add(reservationGridPanel);
 		GridBagLayout gbl_reservationGridPanel = new GridBagLayout();
 		gbl_reservationGridPanel.columnWidths = new int[] {191, 80, 191, 0};
@@ -221,6 +231,7 @@ public class TicketViewMenu extends JFrame {
 		reservationGridPanel.setLayout(gbl_reservationGridPanel);
 		
 		JPanel seatPnel = new JPanel();
+		seatPnel.setBackground(Color.WHITE);
 		seatPnel.setBorder(titled);
 		GridBagConstraints gbc_seatPnel = new GridBagConstraints();
 		gbc_seatPnel.fill = GridBagConstraints.BOTH;
@@ -242,6 +253,7 @@ public class TicketViewMenu extends JFrame {
 		seatLabel.validate();
 		
 		JPanel personnelPanel = new JPanel();
+		personnelPanel.setBackground(Color.WHITE);
 		personnelPanel.setBorder(titled);
 		GridBagConstraints gbc_personnelPanel = new GridBagConstraints();
 		gbc_personnelPanel.fill = GridBagConstraints.BOTH;
@@ -262,6 +274,7 @@ public class TicketViewMenu extends JFrame {
 		personnelPanel.add(personnelLabel);
 		
 		JPanel pricePanel = new JPanel();
+		pricePanel.setBackground(Color.WHITE);
 		GridBagConstraints gbc_pricePanel = new GridBagConstraints();
 		gbc_pricePanel.fill = GridBagConstraints.BOTH;
 		gbc_pricePanel.gridx = 2;
@@ -311,7 +324,9 @@ public class TicketViewMenu extends JFrame {
 		seatLabel.validate();
 		
 		personnelLabel.setText(ticket.getPersonnel());
-		priceLabel.setText(ticket.getPrice());
+		
+		int price = Integer.parseInt(ticket.getPrice());
+		priceLabel.setText(Constants.dFormatter.format(price));
 	}
 	
 	private String getDate(String time) {
@@ -329,7 +344,7 @@ public class TicketViewMenu extends JFrame {
 		Calendar cal = getCalendar(time);
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append(cal.get(Calendar.HOUR)).append(":").append(cal.get(Calendar.MINUTE));
+		sb.append(String.format("%02d", cal.get(Calendar.HOUR_OF_DAY))).append(":").append(String.format("%02d", cal.get(Calendar.MINUTE)));
 		
 		return sb.toString();
 	}

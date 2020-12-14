@@ -13,9 +13,9 @@ public class Main
 			charset.setAccessible(true);
 			charset.set(null, null);
 		} catch (Exception e) {
-
+			e.printStackTrace();
 		}
-
+		
 		System.setProperty("file.encoding","UTF-8");
 		new StartMenu().setVisible(true);
 	}

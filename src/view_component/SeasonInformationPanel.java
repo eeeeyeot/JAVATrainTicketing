@@ -6,7 +6,10 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -19,6 +22,10 @@ import javax.swing.border.TitledBorder;
 
 import constants.Constants;
 import database.SeasonTicketVo;
+import database.TrainDAO;
+import openAPI.TrainAPI;
+import openAPI.TrainVo;
+import view.TrainInquiryMenu;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagLayout;
@@ -27,7 +34,8 @@ import java.awt.Insets;
 
 @SuppressWarnings("serial")
 public class SeasonInformationPanel extends JPanel implements ActionListener{
-
+	static final int SEASON_PERSONNEL = 1;
+	
 	private SeasonTicketVo seasonVo;
 	private JFrame parent;
 	
@@ -153,10 +161,9 @@ public class SeasonInformationPanel extends JPanel implements ActionListener{
 		reservTrainBtn.setFont(font);
 		gridPanel.add(reservTrainBtn);
 		reservTrainBtn.setBorder(titled);
+		reservTrainBtn.addActionListener(this);
 		
 		setBorder(titled);
-		
-		
 		
 		setDepArrPlace(seasonVo.getDepplandPlace(), seasonVo.getArrplandPlace());
 		setEffectiveDate(seasonVo.getEffDate());
@@ -167,21 +174,27 @@ public class SeasonInformationPanel extends JPanel implements ActionListener{
 	public void setDepArrPlace(String dep, String arr) {
 		depArrPlaceLabel.setText(dep + " → " + arr);
 	}
+	
 	public void setEffectiveDate(String date) {
 		if(date == null) return;
 		effDateLabel.setText("" + Constants.getDateKoreanWithLineBreak(date));
 	}
+	
 	public void setExpirationDate(String date) {
 		if(date == null) return;
 		expDateLabel.setText(Constants.getDateKoreanWithLineBreak(date));
 	}
+	
 	public void setTerm(int term) {
 		termLabel.setText(String.format("%d 일", term));
 	}
 	
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() instanceof JButton) {
-			
+			Queue<ArrayList<TrainVo>> command = new LinkedList<ArrayList<TrainVo>>();
+			command.add(TrainAPI.getInstance().getTrainList(seasonVo.getDepplandPlace(), seasonVo.getArrplandPlace(), Constants.getTodayDateToString()));
+			new TrainInquiryMenu(command, parent, null).setVisible(true);
+			parent.setVisible(false);
 		}
 	}
 }

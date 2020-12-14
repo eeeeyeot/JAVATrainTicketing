@@ -2,12 +2,21 @@ package database;
 
 public class SeasonTicketVo 
 {
+	private static SeasonTicketVo instance = null;
+	
 	private String season_id;
 	private String depplandPlace;
 	private String arrplandPlace;
 	private int term;
 	private String effDate;
 	private String expDate;
+	
+	public static SeasonTicketVo getInstance() {
+		if(instance == null) 
+			instance = new SeasonTicketVo();
+		
+		return instance;
+	}
 	
 	public SeasonTicketVo() {}
 	

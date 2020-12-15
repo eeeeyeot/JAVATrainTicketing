@@ -59,7 +59,7 @@ public class StartMenu extends JFrame {
 	public StartMenu() {
 		setTitle("기차 예매 프로그램");
 		dao = TrainDAO.getInstance();
-		// setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 800, 510);
 		contentPane = new JPanel();
 		setContentPane(contentPane);
@@ -67,11 +67,6 @@ public class StartMenu extends JFrame {
 		signUpComponents = new ArrayList<JComponent>();
 		contentPane.setBackground(Color.WHITE);
 
-		this.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
-				System.exit(0);
-			}
-		});
 		GridBagLayout gbl_contentPane = new GridBagLayout();
 		gbl_contentPane.columnWidths = new int[] { 1, 0 };
 		gbl_contentPane.rowHeights = new int[] { 1, 0 };

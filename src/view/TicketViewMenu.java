@@ -53,9 +53,9 @@ public class TicketViewMenu extends JFrame {
 		gbl_contentPane.columnWidths = new int[]{0, 0};
 		gbl_contentPane.rowHeights = new int[]{32, 0, 0, 0, 0, 0};
 		gbl_contentPane.columnWeights = new double[]{1.0, Double.MIN_VALUE};
-		gbl_contentPane.rowWeights = new double[]{1.0, 1.0, 1.0, 1.0, 0.0, Double.MIN_VALUE};
+		gbl_contentPane.rowWeights = new double[]{0.0, 1.0, 1.0, 1.0, 0.0, Double.MIN_VALUE};
 		contentPane.setLayout(gbl_contentPane);
-		contentPane.setBackground(new Color(176, 196, 222));
+		contentPane.setBackground(new Color(240, 255, 255));
 		
 		titled = new TitledBorder(new LineBorder(Color.black, 2));
 		
@@ -66,15 +66,16 @@ public class TicketViewMenu extends JFrame {
 		});
 		
 		JPanel titlePanel = new JPanel();
+		titlePanel.setBackground(new Color(240, 255, 255));
 		//titlePanel.setBackground(new Color(192, 192, 192));
 		GridBagConstraints gbc_titlePanel = new GridBagConstraints();
-		gbc_titlePanel.insets = new Insets(0, 0, 5, 0);
+		gbc_titlePanel.insets = new Insets(0, 0, 0, 0);
 		gbc_titlePanel.fill = GridBagConstraints.BOTH;
 		gbc_titlePanel.gridx = 0;
 		gbc_titlePanel.gridy = 0;
 		contentPane.add(titlePanel, gbc_titlePanel);
 		titlePanel.setLayout(new GridLayout(0, 1, 0, 0));
-		//titlePanel.setBorder(new TitledBorder(new LineBorder(new Color(153, 153, 255), 2)));
+		titlePanel.setBorder(titled);
 		
 		JLabel titleLabel = new JLabel("승차권");
 		titleLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 20));
@@ -100,7 +101,7 @@ public class TicketViewMenu extends JFrame {
 		datePanel.add(reservationDateLabel);
 		
 		JPanel depArrPanel = new JPanel();
-		depArrPanel.setBackground(new Color(176, 196, 222));
+		depArrPanel.setBackground(new Color(240, 255, 255));
 		GridBagConstraints gbc_depArrPanel = new GridBagConstraints();
 		gbc_depArrPanel.insets = new Insets(0, 0, 5, 0);
 		gbc_depArrPanel.fill = GridBagConstraints.BOTH;
@@ -221,7 +222,7 @@ public class TicketViewMenu extends JFrame {
 		reservationInfoPanel.setLayout(new GridLayout(0, 1, 0, 0));
 		
 		JPanel reservationGridPanel = new JPanel();
-		reservationGridPanel.setBackground(new Color(176, 196, 222));
+		reservationGridPanel.setBackground(new Color(240, 255, 255));
 		reservationInfoPanel.add(reservationGridPanel);
 		GridBagLayout gbl_reservationGridPanel = new GridBagLayout();
 		gbl_reservationGridPanel.columnWidths = new int[] {191, 80, 191, 0};

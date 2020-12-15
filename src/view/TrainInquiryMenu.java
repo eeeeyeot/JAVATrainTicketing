@@ -98,7 +98,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		JPanel titlePanel = new JPanel();
 		titlePanel.setBackground(new Color(176, 196, 222));
 		GridBagConstraints gbc_titlePanel = new GridBagConstraints();
-		gbc_titlePanel.insets = new Insets(0, 0, 5, 0);
+		gbc_titlePanel.insets = new Insets(0, 0, 0, 0);
 		gbc_titlePanel.fill = GridBagConstraints.BOTH;
 		gbc_titlePanel.gridx = 0;
 		gbc_titlePanel.gridy = 0;
@@ -182,7 +182,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		JPanel datePanel = new JPanel();
 		datePanel.setBackground(Color.WHITE);
 		GridBagConstraints gbc_datePanel = new GridBagConstraints();
-		gbc_datePanel.fill = GridBagConstraints.HORIZONTAL;
+		gbc_datePanel.fill = GridBagConstraints.BOTH;
 		gbc_datePanel.insets = new Insets(0, 0, 0, 0);
 		gbc_datePanel.gridx = 0;
 		gbc_datePanel.gridy = 0;
@@ -191,7 +191,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		gbl_datePanel.columnWidths = new int[]{92, 0};
 		gbl_datePanel.rowHeights = new int[]{23, 0};
 		gbl_datePanel.columnWeights = new double[]{1.0, Double.MIN_VALUE};
-		gbl_datePanel.rowWeights = new double[]{0.0, Double.MIN_VALUE};
+		gbl_datePanel.rowWeights = new double[]{1.0, Double.MIN_VALUE};
 		datePanel.setLayout(gbl_datePanel);
 		datePanel.setBorder(titleBorder);
 		
@@ -199,7 +199,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		presentlyDateLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		presentlyDateLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
 		GridBagConstraints gbc_presentlyDateLabel = new GridBagConstraints();
-		gbc_presentlyDateLabel.fill = GridBagConstraints.HORIZONTAL;
+		gbc_presentlyDateLabel.fill = GridBagConstraints.BOTH;
 		gbc_presentlyDateLabel.gridx = 0;
 		gbc_presentlyDateLabel.gridy = 0;
 		datePanel.add(presentlyDateLabel, gbc_presentlyDateLabel);
@@ -310,6 +310,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		selectSeatPanel.setLayout(gbl_selectSeatPanel);
 		
 		chargeInfoPanel = new JPanel();
+		chargeInfoPanel.setBackground(Color.WHITE);
 		GridBagConstraints gbc_chargeInfoPanel = new GridBagConstraints();
 		gbc_chargeInfoPanel.fill = GridBagConstraints.BOTH;
 		gbc_chargeInfoPanel.insets = new Insets(0, 0, 5, 0);
@@ -319,6 +320,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		chargeInfoPanel.setLayout(new GridLayout(3, 0, 0, 0));
 		
 		JPanel seatInfoPanel = new JPanel();
+		seatInfoPanel.setBackground(Color.WHITE);
 		GridBagConstraints gbc_seatInfoPanel = new GridBagConstraints();
 		gbc_seatInfoPanel.insets = new Insets(0, 0, 5, 0);
 		gbc_seatInfoPanel.fill = GridBagConstraints.BOTH;
@@ -333,6 +335,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		seatInfoPanel.add(lblNewLabel, BorderLayout.WEST);
 		
 		JPanel seatSelectPanel = new JPanel();
+		seatSelectPanel.setBackground(Color.WHITE);
 		seatInfoPanel.add(seatSelectPanel, BorderLayout.CENTER);
 		GridBagLayout gbl_seatSelectPanel = new GridBagLayout();
 		gbl_seatSelectPanel.columnWidths = new int[]{872, 0, 0};
@@ -364,6 +367,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		
 		JButton reservationButton = new JButton("예 매");
 		reservationButton.setFont(new Font("맑은 고딕", Font.PLAIN, 30));
+		reservationButton.setBackground(new Color(153, 204, 255));
 		GridBagConstraints gbc_reservationButton = new GridBagConstraints();
 		gbc_reservationButton.fill = GridBagConstraints.BOTH;
 		gbc_reservationButton.gridx = 0;
@@ -417,6 +421,7 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 			chargeLabels[i].setFont(new Font("맑은 고딕", Font.BOLD, 16));
 			chargeLabels[i].setHorizontalAlignment(SwingConstants.CENTER);
 			chargePanels[i / 3].add(chargeLabels[i]);
+			chargePanels[i / 3].setBackground(Color.WHITE);
 		}
 		
 		for(int i = 0; i < chargePanels.length; i++) {
@@ -634,11 +639,16 @@ public class TrainInquiryMenu extends JFrame implements ActionListener{
 		jd.setLocation(ScreenUtil.getCurrentCenter(this, jd));
 		jd.setResizable(false);
 		jd.getContentPane().setLayout(new FlowLayout());
+		jd.getContentPane().setBackground(Color.WHITE);
 		
 		JLabel message = new JLabel(msg);
 		JButton confirm = new JButton("확인");
 		JButton cancel = new JButton("취소");
 		message.setFont(new Font("맑은 고딕", Font.BOLD, 12));
+		
+		confirm.setBackground(new Color(153, 204, 255));
+		cancel.setBackground(new Color(153, 204, 255));
+		
 		jd.getContentPane().add(message);
 		jd.getContentPane().add(confirm);
 		jd.getContentPane().add(cancel);

@@ -76,6 +76,7 @@ public class TicketInformationPanel extends JPanel implements ActionListener{
 		
 		detailButton.setFont(font);
 		detailButton.setBorder(titled);
+		detailButton.setBackground(new Color(153, 204, 255));
 		detailButton.addActionListener(this);
 		centerPanel.add(detailButton);
 		centerPanel.setBackground(new Color(0xF0, 0xFF, 0xFF));

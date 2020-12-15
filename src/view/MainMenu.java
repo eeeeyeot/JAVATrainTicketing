@@ -64,6 +64,7 @@ public class MainMenu extends JFrame {
 	@SuppressWarnings("unused")
 	private static final int SEASON_PERSONNEL = 1;
 
+	private TrainAPI api;
 	private TrainDAO dao;
 	private UserVo userVo;
 
@@ -105,6 +106,9 @@ public class MainMenu extends JFrame {
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setResizable(true);
 
+		dao = TrainDAO.getInstance();
+		api = TrainAPI.getInstance();
+		
 		panelBorder = new TitledBorder(new LineBorder(Color.BLACK, 2));
 		titleBorder = new TitledBorder(new LineBorder(Color.LIGHT_GRAY, 1));
 		
@@ -112,7 +116,7 @@ public class MainMenu extends JFrame {
 		northPanel.setBackground(Color.WHITE);
 		contentPane.add(northPanel, BorderLayout.NORTH);
 		GridBagLayout gbl_northPanel = new GridBagLayout();
-		gbl_northPanel.columnWidths = new int[] { 174, 295, 0 };
+		gbl_northPanel.columnWidths = new int[] { 174, 615, 0 };
 		gbl_northPanel.rowHeights = new int[] { 121, 0 };
 		gbl_northPanel.columnWeights = new double[] { 0.0, 0.0, Double.MIN_VALUE };
 		gbl_northPanel.rowWeights = new double[] { 0.0, 1.0 };
@@ -153,8 +157,9 @@ public class MainMenu extends JFrame {
 			Image background = new ImageIcon(Main.class.getResource("../image/korailImage.jpg")).getImage();
 
 			public void paint(Graphics g) {
-
-				g.drawImage(background, 0, 0, gbl_northPanel.columnWidths[1], gbl_northPanel.rowHeights[0], null);
+				int x = (gbl_northPanel.columnWidths[1] - background.getWidth(null)) / 2;
+				g.drawImage(background, x, 0, gbl_northPanel.columnWidths[1] - (x * 2), gbl_northPanel.rowHeights[0], null);
+				
 			}
 
 		};
@@ -188,7 +193,7 @@ public class MainMenu extends JFrame {
 		gbc_licenseLabel.gridy = 0;
 		titlePanel.add(licenseLabel, gbc_licenseLabel);
 
-		JLabel korailLabel = new JLabel("Korail");
+		JLabel korailLabel = new JLabel("");
 		korailLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 40));
 		korailLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		GridBagConstraints gbc_korailLabel = new GridBagConstraints();
@@ -409,7 +414,7 @@ public class MainMenu extends JFrame {
 	public MainMenu(UserVo userVo, Window parent) {
 		this();
 		this.userVo = userVo;
-		dao = TrainDAO.getInstance();
+		
 		setWelcoming();
 		this.parent = parent;
 
@@ -427,7 +432,6 @@ public class MainMenu extends JFrame {
 
 	public void addSeasonReservation(String seasonId) {
 		dao.insertSeasonReservation(userVo.getId(), seasonId);
-
 	}
 
 	@SuppressWarnings("unchecked")
@@ -941,8 +945,8 @@ public class MainMenu extends JFrame {
 				if (depText.equals(arrText)) 
 				{
 					showDialog("출발지와 도착지가 같습니다.");
-				} else if (!TrainAPI.getInstance().getStationNames().contains(depText)
-						|| !TrainAPI.getInstance().getStationNames().contains(arrText)) 
+				} else if (!api.getStationNames().contains(depText)
+						|| !api.getStationNames().contains(arrText)) 
 				{
 					showDialog("출발지 혹은 도착지의 정보가 잘못됐습니다.");
 				}
@@ -961,10 +965,10 @@ public class MainMenu extends JFrame {
 				else 
 				{
 					Queue<ArrayList<TrainVo>> command = new LinkedList<ArrayList<TrainVo>>();
-					command.add(TrainAPI.getInstance().getTrainList(depText, arrText, dayToGo));
+					command.add(api.getTrainList(depText, arrText, dayToGo));
 
 					if (selectedIndex == 1) {
-						command.add(TrainAPI.getInstance().getTrainList(arrText, depText, dayComing));
+						command.add(api.getTrainList(arrText, depText, dayComing));
 					}
 
 					new TrainInquiryMenu(command, thisObj, personnelArray).setVisible(true);
@@ -1122,8 +1126,8 @@ public class MainMenu extends JFrame {
 
 				if (seasonDepCombo.getComboBoxText().equals(seasonArrCombo.getComboBoxText())) {
 					showDialog("출발지와 도착지가 같습니다.");
-				} else if (!TrainAPI.getInstance().getStationNames().contains(seasonDepCombo.getComboBoxText())
-						|| !TrainAPI.getInstance().getStationNames().contains(seasonArrCombo.getComboBoxText())) {
+				} else if (!api.getStationNames().contains(seasonDepCombo.getComboBoxText())
+						|| !api.getStationNames().contains(seasonArrCombo.getComboBoxText())) {
 					showDialog("출발지 혹은 도착지의 정보가 잘못됐습니다.");
 				} else {
 					String expiration = Constants.getAddedDate(Calendar.DAY_OF_MONTH,

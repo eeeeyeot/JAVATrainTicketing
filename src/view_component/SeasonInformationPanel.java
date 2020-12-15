@@ -161,6 +161,7 @@ public class SeasonInformationPanel extends JPanel implements ActionListener{
 		reservTrainBtn.setFont(font);
 		gridPanel.add(reservTrainBtn);
 		reservTrainBtn.setBorder(titled);
+		reservTrainBtn.setBackground(new Color(153, 204, 255));
 		reservTrainBtn.addActionListener(this);
 		
 		setBorder(titled);

@@ -24,6 +24,7 @@ public class NoticeDialog extends JDialog {
 
 	public NoticeDialog(String info, Component parent) {
 		super((Frame) parent, "알림", true);
+		getContentPane().setBackground(Color.WHITE);
 		setForeground(Color.WHITE);
 		getContentPane().setForeground(Color.WHITE);
 		setSize(250, 150);
@@ -43,6 +44,7 @@ public class NoticeDialog extends JDialog {
 		JButton ok = new JButton("확인");
 		
 		JPanel panel = new JPanel();
+		panel.setBackground(Color.WHITE);
 		panel.setForeground(Color.WHITE);
 		panel.setLayout(new FlowLayout());
 		getContentPane().add(panel);

@@ -5,9 +5,7 @@ import javax.swing.JLabel;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -22,7 +20,6 @@ import javax.swing.border.TitledBorder;
 
 import constants.Constants;
 import database.SeasonTicketVo;
-import database.TrainDAO;
 import openAPI.TrainAPI;
 import openAPI.TrainVo;
 import view.TrainInquiryMenu;
@@ -39,8 +36,6 @@ public class SeasonInformationPanel extends JPanel implements ActionListener{
 	private SeasonTicketVo seasonVo;
 	private JFrame parent;
 	
-	private SimpleDateFormat sf;
-	
 	private JLabel depArrPlaceLabel;
 	private JLabel effDateLabel;
 	private JLabel expDateLabel;
@@ -49,7 +44,6 @@ public class SeasonInformationPanel extends JPanel implements ActionListener{
 	private JPanel gridPanel;
 	private JLabel ticketingDateLabel;
 	
-	private Calendar cal;
 	private JPanel reservationDatePanel;
 	private JPanel descriptionPanel;
 	private JLabel lblNewLabel;
@@ -62,8 +56,6 @@ public class SeasonInformationPanel extends JPanel implements ActionListener{
 	public SeasonInformationPanel(SeasonTicketVo seasonVo, JFrame parent) {
 		this.seasonVo = seasonVo;
 		this.parent = parent;
-		sf = new SimpleDateFormat("yyyyMMddHHmm");
-		cal = Calendar.getInstance();
 		TitledBorder titled = new TitledBorder(new LineBorder(new Color(47, 48, 61), 2));
 		Font font = new Font("맑은 고딕", Font.PLAIN, 18);
 		setLayout(new BorderLayout(0, 0));
